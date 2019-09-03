@@ -5,17 +5,24 @@ import (
 	"context"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"os"
 
 	"github.com/google/go-github/v28/github"
+	"golang.org/x/oauth2"
 )
 
 var ghc *github.Client
 
 func init() {
-	client := github.NewClient(nil)
-	ghc = client
+	accessToken := os.Getenv("GITHUB_TOKEN")
+	ctx := context.Background()
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: accessToken},
+	)
+	tc := oauth2.NewClient(ctx, ts)
+	// initialize ghc var
+	ghc = github.NewClient(tc)
 }
-
 func FindRepository(meta *RepositoryMetadata) (*github.Repository, error) {
 	ctx := context.Background()
 	repo, _, err := ghc.Repositories.Get(ctx, meta.Owner, meta.Name)
@@ -38,6 +45,15 @@ type RepositoryMetadata struct {
 type RepositorySpec struct {
 	Description *string `yaml:"description"`
 	Private     *bool   `yaml:"private"`
+	Topics      []Topic `yaml:"topics"`
+	Labels      []Label `yaml:"labels"`
+}
+type Topic string
+
+type Label struct {
+	Name        string `yaml:"name"`
+	Description string `yaml:"description"`
+	Color       string `yaml:"color"`
 }
 
 func (rs *RepositorySpec) Patch(repo *github.Repository) {

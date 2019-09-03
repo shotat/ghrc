@@ -1,6 +1,6 @@
 metadata:
   owner: shotat
-  name: rbdash
+  name: sandbox-lol
 spec:
   description: I'm awesome!!!
   homepage: ""
@@ -9,7 +9,9 @@ spec:
     - go
     - GitHub
   labels:
-    - name: labeldayo
+    - name: "bug :bug:"
+      description: "Small bug fix required"
+      color: "b01f26"
   allow_rebase_merge: true
   allow_squash_merge: true
   allow_merge_commit: true
