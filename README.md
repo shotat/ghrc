@@ -1,13 +1,15 @@
 # GHRC
 
-GHRC is a tool for managing *G*it*H*ub *R*epository *C*onfigurations in declarative way.
+GHRC is a tool for managing **G**it**H**ub **R**epository **C**onfigurations in a declarative way.
 
 ## How to use
 
-`GITHUB_TOKEN`
-`.ghrc.yaml`
+WIP
+
+set `GITHUB_TOKEN`
+read `.ghrc.yaml`
 
 ## TODO
 
-- [ ] label
+- [ ] labels
 - [ ] dry-run
