@@ -1,0 +1,15 @@
+metadata:
+  owner: shotat
+  name: rbdash
+spec:
+  description: I'm awesome!!!
+  homepage: ""
+  private: false
+  topics:
+    - go
+    - GitHub
+  labels:
+    - name: labeldayo
+  allow_rebase_merge: true
+  allow_squash_merge: true
+  allow_merge_commit: true
