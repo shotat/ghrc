@@ -6,3 +6,8 @@ GHRC is a tool for managing *G*it*H*ub *R*epository *C*onfigurations in declarat
 
 `GITHUB_TOKEN`
 `.ghrc.yaml`
+
+## TODO
+
+- [ ] label
+- [ ] dry-run

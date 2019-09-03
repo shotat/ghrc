@@ -3,6 +3,7 @@ package ghrc
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
@@ -43,12 +44,11 @@ type RepositoryMetadata struct {
 }
 
 type RepositorySpec struct {
-	Description *string `yaml:"description"`
-	Private     *bool   `yaml:"private"`
-	Topics      []Topic `yaml:"topics"`
-	Labels      []Label `yaml:"labels"`
+	Description *string  `yaml:"description"`
+	Private     *bool    `yaml:"private"`
+	Topics      []string `yaml:"topics"`
+	Labels      []Label  `yaml:"labels"`
 }
-type Topic string
 
 type Label struct {
 	Name        string `yaml:"name"`
@@ -73,12 +73,23 @@ func LoadRepositoryConfigFromFile(path string) (*RepositoryConfig, error) {
 	return conf, nil
 }
 
+// TODO
+func (rc *RepositoryConfig) Plan() error {
+	return nil
+}
+
 func (rc *RepositoryConfig) Apply() error {
 	ctx := context.Background()
 	repo, err := FindRepository(rc.Metadata)
 	if err != nil {
 		return err
 	}
+	fmt.Println(rc.Spec.Topics)
+	_, _, err = ghc.Repositories.ReplaceAllTopics(ctx, rc.Metadata.Owner, rc.Metadata.Name, rc.Spec.Topics)
+	if err != nil {
+		return err
+	}
+
 	rc.Spec.Patch(repo)
 	_, _, err = ghc.Repositories.Edit(ctx, rc.Metadata.Owner, rc.Metadata.Name, repo)
 	return err
