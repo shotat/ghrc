@@ -1,0 +1,20 @@
+metadata:
+  owner: shotat
+  name: sandbox-lol
+spec:
+  description: I'm awesome!!!
+  homepage: ""
+  private: false
+  topics:
+    - go
+    - github
+  labels:
+    - name: "bug :bug:"
+      description: "Small bug fix required"
+      color: "b01f26"
+    - name: "ready_for_review"
+      description: ""
+      color: "000000"
+  allow_rebase_merge: true
+  allow_squash_merge: true
+  allow_merge_commit: true
