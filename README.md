@@ -6,10 +6,7 @@ GHRC is a tool for managing **G**it**H**ub **R**epository **C**onfigurations in 
 
 WIP
 
-set `GITHUB_TOKEN`
-read `.ghrc.yaml`
+## Environment Variables
 
-## TODO
-
-- [ ] labels
-- [ ] dry-run
+- `GHRC_GITHUB_TOKEN`
+- `GHRC_GITHUB_API` (default: "https://api.github.com")

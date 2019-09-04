@@ -29,14 +29,11 @@ func ExportConfig(meta *RepositoryMetadata) (*RepositoryConfig, error) {
 	if err != nil {
 		return nil, err
 	}
-	branches, _, err := ghc.Repositories.ListBranches(ctx, meta.Owner, meta.Name, nil)
-	var protectedBranches []*github.Branch
-	for _, b := range branches {
-		if b.GetProtected() {
-			protectedBranches = append(protectedBranches, b)
-		}
+	protected := true
+	opt := &github.BranchListOptions{
+		Protected: &protected,
 	}
-
+	protectedBranches, _, err := ghc.Repositories.ListBranches(ctx, meta.Owner, meta.Name, opt)
 	conf := new(RepositoryConfig)
 	conf.Metadata = meta
 	// Spec
