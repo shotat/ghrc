@@ -18,7 +18,7 @@ func FindRepository(meta *RepositoryMetadata) (*github.Repository, error) {
 	return repo, nil
 }
 
-func ExportConfig(meta *RepositoryMetadata) (*RepositoryConfig, error) {
+func ImportConfig(meta *RepositoryMetadata) (*RepositoryConfig, error) {
 	ctx := context.Background()
 	repo, _, err := ghc.Repositories.Get(ctx, meta.Owner, meta.Name)
 	if err != nil {
@@ -120,12 +120,23 @@ func (rc *RepositoryConfig) Apply() error {
 	if err != nil {
 		return err
 	}
-	_, _, err = ghc.Repositories.ReplaceAllTopics(ctx, rc.Metadata.Owner, rc.Metadata.Name, rc.Spec.Topics)
+
+	rc.Spec.Patch(repo)
+	_, _, err = ghc.Repositories.Edit(ctx, rc.Metadata.Owner, rc.Metadata.Name, repo)
 	if err != nil {
 		return err
 	}
 
-	rc.Spec.Patch(repo)
-	_, _, err = ghc.Repositories.Edit(ctx, rc.Metadata.Owner, rc.Metadata.Name, repo)
-	return err
+	if rc.Spec.Topics != nil {
+		_, _, err = ghc.Repositories.ReplaceAllTopics(ctx, rc.Metadata.Owner, rc.Metadata.Name, rc.Spec.Topics)
+		if err != nil {
+			return err
+		}
+	}
+
+	// TODO label
+
+	// TODO protections
+
+	return nil
 }

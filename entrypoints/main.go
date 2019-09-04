@@ -31,7 +31,7 @@ func apply() error {
 
 func export() error {
 	meta := &ghrc.RepositoryMetadata{"shotat", "ghrc"}
-	conf, err := ghrc.ExportConfig(meta)
+	conf, err := ghrc.ImportConfig(meta)
 	if err != nil {
 		return err
 	}
