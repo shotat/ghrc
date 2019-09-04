@@ -15,6 +15,14 @@ spec:
     - name: "ready_for_review"
       description: ""
       color: "000000"
-  allow_rebase_merge: true
-  allow_squash_merge: true
-  allow_merge_commit: true
+  allowRebaseMerge: true
+  allowSquashMerge: true
+  allowMergeCommit: true
+  protections:
+    branch: master
+    requiredStatusChecks:
+      strict: true
+      contexts: []
+    enforceAdmins: false
+    requiredPullRequestReviews: null
+    restrictions: null
