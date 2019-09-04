@@ -20,7 +20,18 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		meta := &ghrc.RepositoryMetadata{"shotat", "ghrc"}
+		owner, err := cmd.Flags().GetString("owner")
+		if err != nil {
+			return err
+		}
+		repo, err := cmd.Flags().GetString("repo")
+		if err != nil {
+			return err
+		}
+		meta := &ghrc.RepositoryMetadata{
+			Owner: owner,
+			Name:  repo,
+		}
 		conf, err := ghrc.ImportConfig(meta)
 		if err != nil {
 			return err
@@ -35,6 +46,9 @@ to quickly create a Cobra application.`,
 
 func init() {
 	rootCmd.AddCommand(importCmd)
+
+	importCmd.Flags().String("repo", "", "repository name")
+	importCmd.Flags().String("owner", "", "owner name")
 
 	// Here you will define your flags and configuration settings.
 
