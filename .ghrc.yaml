@@ -1,6 +1,6 @@
 metadata:
   owner: shotat
-  name: sandbox-lol
+  name: ghrc
 spec:
   description: I'm awesome!!!
   homepage: ""
@@ -12,7 +12,7 @@ spec:
     - name: "bug :bug:"
       description: "Small bug fix required"
       color: "b01f26"
-    - name: "ready_for_review"
+    - name: "skip_ci"
       description: ""
       color: "000000"
   allowRebaseMerge: true

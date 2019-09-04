@@ -9,9 +9,7 @@ import (
 )
 
 const (
-	filepath = "./example/sample.yaml"
-
-// filepath = ".ghrc.yaml"
+	filepath = ".ghrc.yaml"
 )
 
 func main() {
@@ -32,7 +30,7 @@ func apply() error {
 }
 
 func export() error {
-	meta := &ghrc.RepositoryMetadata{"shotat", "tenka"}
+	meta := &ghrc.RepositoryMetadata{"shotat", "ghrc"}
 	conf, err := ghrc.ExportConfig(meta)
 	if err != nil {
 		return err
