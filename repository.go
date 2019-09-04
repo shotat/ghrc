@@ -19,11 +19,44 @@ func FindRepository(meta *RepositoryMetadata) (*github.Repository, error) {
 	return repo, nil
 }
 
-func ExportConfig(repo *github.Repository) (*RepositoryConfig, error) {
+func ExportConfig(meta *RepositoryMetadata) (*RepositoryConfig, error) {
+	ctx := context.Background()
+	repo, _, err := ghc.Repositories.Get(ctx, meta.Owner, meta.Name)
+	if err != nil {
+		return nil, err
+	}
+	labels, _, err := ghc.Issues.ListLabels(ctx, meta.Owner, meta.Name, nil)
+	if err != nil {
+		return nil, err
+	}
+	branches, _, err := ghc.Repositories.ListBranches(ctx, meta.Owner, meta.Name, nil)
+	var protectedBranches []*github.Branch
+	for _, b := range branches {
+		if b.GetProtected() {
+			protectedBranches = append(protectedBranches, b)
+		}
+	}
+
 	conf := new(RepositoryConfig)
+	conf.Metadata = meta
+	// Spec
 	spec := new(RepositorySpec)
 	spec.Description = repo.Description
 	spec.Private = repo.Private
+	spec.Topics = repo.Topics
+	for _, label := range labels {
+		spec.Labels = append(spec.Labels, Label{
+			Name:        label.Name,
+			Description: label.Description,
+			Color:       label.Color,
+		})
+	}
+	for _, pb := range protectedBranches {
+		spec.Protections = append(spec.Protections, Protection{
+			Branch: pb.Name,
+		})
+	}
+
 	conf.Spec = spec
 	return conf, nil
 }
@@ -39,16 +72,22 @@ type RepositoryMetadata struct {
 }
 
 type RepositorySpec struct {
-	Description *string  `yaml:"description"`
-	Private     *bool    `yaml:"private"`
-	Topics      []string `yaml:"topics"`
-	Labels      []Label  `yaml:"labels"`
+	Description *string      `yaml:"description"`
+	Private     *bool        `yaml:"private"`
+	Topics      []string     `yaml:"topics"`
+	Labels      []Label      `yaml:"labels"`
+	Protections []Protection `yaml:"protections"`
+}
+
+type Protection struct {
+	Branch        *string `yaml:"branch"`
+	EnforceAdmins *bool   `yaml:"enforceAdmins"`
 }
 
 type Label struct {
-	Name        string `yaml:"name"`
-	Description string `yaml:"description"`
-	Color       string `yaml:"color"`
+	Name        *string `yaml:"name"`
+	Description *string `yaml:"description"`
+	Color       *string `yaml:"color"`
 }
 
 func (rs *RepositorySpec) Patch(repo *github.Repository) {
