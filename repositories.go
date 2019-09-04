@@ -3,7 +3,6 @@ package ghrc
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 
@@ -25,22 +24,23 @@ func ExportConfig(meta *RepositoryMetadata) (*RepositoryConfig, error) {
 	if err != nil {
 		return nil, err
 	}
-	labels, _, err := ghc.Issues.ListLabels(ctx, meta.Owner, meta.Name, nil)
-	if err != nil {
-		return nil, err
-	}
-	protected := true
-	opt := &github.BranchListOptions{
-		Protected: &protected,
-	}
-	protectedBranches, _, err := ghc.Repositories.ListBranches(ctx, meta.Owner, meta.Name, opt)
 	conf := new(RepositoryConfig)
 	conf.Metadata = meta
+
 	// Spec
 	spec := new(RepositorySpec)
+	spec.Homepage = repo.Homepage
 	spec.Description = repo.Description
 	spec.Private = repo.Private
 	spec.Topics = repo.Topics
+	spec.AllowSquashMerge = repo.AllowSquashMerge
+	spec.AllowMergeCommit = repo.AllowMergeCommit
+	spec.AllowRebaseMerge = repo.AllowRebaseMerge
+
+	labels, err := findLabels(meta)
+	if err != nil {
+		return nil, err
+	}
 	for _, label := range labels {
 		spec.Labels = append(spec.Labels, Label{
 			Name:        label.Name,
@@ -48,11 +48,12 @@ func ExportConfig(meta *RepositoryMetadata) (*RepositoryConfig, error) {
 			Color:       label.Color,
 		})
 	}
-	for _, pb := range protectedBranches {
-		spec.Protections = append(spec.Protections, Protection{
-			Branch: pb.Name,
-		})
+
+	protections, err := findProtections(meta)
+	if err != nil {
+		return nil, err
 	}
+	spec.Protections = protections
 
 	conf.Spec = spec
 	return conf, nil
@@ -69,16 +70,16 @@ type RepositoryMetadata struct {
 }
 
 type RepositorySpec struct {
-	Description *string      `yaml:"description"`
-	Private     *bool        `yaml:"private"`
+	Description      *string `yaml:"description"`
+	Homepage         *string `yaml:"homepage"`
+	Private          *bool   `yaml:"private"`
+	AllowSquashMerge *bool   `yaml:"allowSquashMerge"`
+	AllowMergeCommit *bool   `yaml:"allowMergeCommit"`
+	AllowRebaseMerge *bool   `yaml:"allowRebaseMerge"`
+
 	Topics      []string     `yaml:"topics"`
 	Labels      []Label      `yaml:"labels"`
 	Protections []Protection `yaml:"protections"`
-}
-
-type Protection struct {
-	Branch        *string `yaml:"branch"`
-	EnforceAdmins *bool   `yaml:"enforceAdmins"`
 }
 
 type Label struct {
@@ -90,6 +91,10 @@ type Label struct {
 func (rs *RepositorySpec) Patch(repo *github.Repository) {
 	repo.Description = rs.Description
 	repo.Private = rs.Private
+	repo.Homepage = rs.Homepage
+	repo.AllowSquashMerge = rs.AllowSquashMerge
+	repo.AllowMergeCommit = rs.AllowMergeCommit
+	repo.AllowRebaseMerge = rs.AllowRebaseMerge
 }
 
 func LoadRepositoryConfigFromFile(path string) (*RepositoryConfig, error) {
@@ -115,7 +120,6 @@ func (rc *RepositoryConfig) Apply() error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(rc.Spec.Topics)
 	_, _, err = ghc.Repositories.ReplaceAllTopics(ctx, rc.Metadata.Owner, rc.Metadata.Name, rc.Spec.Topics)
 	if err != nil {
 		return err
