@@ -1,12 +1,14 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 
 	"bytes"
-	"github.com/shotat/ghrc/spec"
+
+	"github.com/shotat/ghrc/config"
 	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v2"
 )
 
 // importCmd represents the import command
@@ -28,11 +30,8 @@ to quickly create a Cobra application.`,
 		if err != nil {
 			return err
 		}
-		meta := &ghrc.RepositoryMetadata{
-			Owner: owner,
-			Name:  repo,
-		}
-		conf, err := ghrc.ImportConfig(meta)
+		ctx := context.Background()
+		conf, err := config.Import(ctx, owner, repo)
 		if err != nil {
 			return err
 		}
