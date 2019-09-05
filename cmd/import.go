@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"bytes"
-	"github.com/shotat/ghrc"
+	"github.com/shotat/ghrc/spec"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 )

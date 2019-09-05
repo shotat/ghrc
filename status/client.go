@@ -1,4 +1,4 @@
-package ghrc
+package status
 
 import (
 	"context"

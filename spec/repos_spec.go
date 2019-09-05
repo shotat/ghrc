@@ -1,4 +1,4 @@
-package ghrc
+package spec
 
 import (
 	"bytes"
@@ -6,21 +6,11 @@ import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 
-	"github.com/google/go-github/v28/github"
+	"github.com/shotat/ghrc/status"
 )
 
-func FindRepository(meta *RepositoryMetadata) (*github.Repository, error) {
-	ctx := context.Background()
-	repo, _, err := ghc.Repositories.Get(ctx, meta.Owner, meta.Name)
-	if err != nil {
-		return nil, err
-	}
-	return repo, nil
-}
-
-func ImportConfig(meta *RepositoryMetadata) (*RepositoryConfig, error) {
-	ctx := context.Background()
-	repo, _, err := ghc.Repositories.Get(ctx, meta.Owner, meta.Name)
+func ImportConfig(ctx context.Context, meta *RepositoryMetadata) (*RepositoryConfig, error) {
+	repo, err := status.FindRepositoryStatus(meta.Owner, meta.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -37,25 +27,20 @@ func ImportConfig(meta *RepositoryMetadata) (*RepositoryConfig, error) {
 	spec.AllowMergeCommit = repo.AllowMergeCommit
 	spec.AllowRebaseMerge = repo.AllowRebaseMerge
 
-	labels, err := findLabels(meta)
-	if err != nil {
-		return nil, err
-	}
-	for _, label := range labels {
-		spec.Labels = append(spec.Labels, Label{
-			Name:        label.Name,
-			Description: label.Description,
-			Color:       label.Color,
-		})
+	if repo.Labels != nil {
+		spec.Labels = make([]Label, len(repo.Labels))
+		for i, label := range repo.Labels {
+			spec.Labels[i] = Label{
+				Name:        label.Name,
+				Description: label.Description,
+				Color:       label.Color,
+			}
+		}
 	}
 
-	protections, err := findProtections(meta)
-	if err != nil {
-		return nil, err
-	}
-	spec.Protections = protections
-
-	conf.Spec = spec
+	// TODO
+	// spec.Protections = repo.Protections
+	// conf.Spec = spec
 	return conf, nil
 }
 
@@ -88,7 +73,7 @@ type Label struct {
 	Color       *string `yaml:"color"`
 }
 
-func (rs *RepositorySpec) Patch(repo *github.Repository) {
+func (rs *RepositorySpec) Patch(repo *status.RepositoryStatus) {
 	repo.Description = rs.Description
 	repo.Private = rs.Private
 	repo.Homepage = rs.Homepage
@@ -110,33 +95,17 @@ func LoadRepositoryConfigFromFile(path string) (*RepositoryConfig, error) {
 }
 
 // TODO
-func (rc *RepositoryConfig) Plan() error {
+func (rc *RepositoryConfig) Plan(ctx context.Context) error {
 	return nil
 }
 
-func (rc *RepositoryConfig) Apply() error {
-	ctx := context.Background()
-	repo, err := FindRepository(rc.Metadata)
+func (rc *RepositoryConfig) Apply(ctx context.Context) error {
+	repo, err := status.FindRepositoryStatus(rc.Metadata.Owner, rc.Metadata.Name)
 	if err != nil {
 		return err
 	}
 
 	rc.Spec.Patch(repo)
-	_, _, err = ghc.Repositories.Edit(ctx, rc.Metadata.Owner, rc.Metadata.Name, repo)
-	if err != nil {
-		return err
-	}
-
-	if rc.Spec.Topics != nil {
-		_, _, err = ghc.Repositories.ReplaceAllTopics(ctx, rc.Metadata.Owner, rc.Metadata.Name, rc.Spec.Topics)
-		if err != nil {
-			return err
-		}
-	}
-
-	// TODO label
-
-	// TODO protections
 
 	return nil
 }

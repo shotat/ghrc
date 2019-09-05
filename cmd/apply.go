@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/shotat/ghrc"
+	"github.com/shotat/ghrc/spec"
 	"github.com/spf13/cobra"
 )
 
