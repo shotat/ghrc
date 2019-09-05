@@ -5,22 +5,22 @@ import (
 )
 
 type RepositorySpec struct {
-	Description      *string `yaml:"description"`
-	Homepage         *string `yaml:"homepage"`
-	Private          *bool   `yaml:"private"`
-	AllowSquashMerge *bool   `yaml:"allowSquashMerge"`
-	AllowMergeCommit *bool   `yaml:"allowMergeCommit"`
-	AllowRebaseMerge *bool   `yaml:"allowRebaseMerge"`
+	Description      *string `yaml:"description,omitempty"`
+	Homepage         *string `yaml:"homepage,omitempty"`
+	Private          bool    `yaml:"private"`
+	AllowSquashMerge bool    `yaml:"allowSquashMerge"`
+	AllowMergeCommit bool    `yaml:"allowMergeCommit"`
+	AllowRebaseMerge bool    `yaml:"allowRebaseMerge"`
 
-	Topics      []string     `yaml:"topics"`
-	Labels      []Label      `yaml:"labels"`
-	Protections []Protection `yaml:"protections"`
+	Topics      []string     `yaml:"topics,omitempty"`
+	Labels      []Label      `yaml:"labels,omitempty"`
+	Protections []Protection `yaml:"protections,omitempty"`
 }
 
 type Label struct {
-	Name        *string `yaml:"name"`
-	Description *string `yaml:"description"`
-	Color       *string `yaml:"color"`
+	Name        string  `yaml:"name"`
+	Description *string `yaml:"description,omitempty"`
+	Color       string  `yaml:"color"`
 }
 
 func (rs *RepositorySpec) Patch(repo *status.RepositoryStatus) {

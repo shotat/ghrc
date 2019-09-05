@@ -34,12 +34,13 @@ func Import(ctx context.Context, owner string, name string) (*RepositoryConfig, 
 		return nil, err
 	}
 	conf := new(RepositoryConfig)
-	conf.Metadata = &metadata.RepositoryMetadata{
+	meta := &metadata.RepositoryMetadata{
 		Owner: owner,
 		Name:  name,
 	}
 
-	// Spec
+	conf.Metadata = meta
+
 	rs := new(spec.RepositorySpec)
 	rs.Homepage = repo.Homepage
 	rs.Description = repo.Description
@@ -62,7 +63,9 @@ func Import(ctx context.Context, owner string, name string) (*RepositoryConfig, 
 
 	// TODO
 	// spec.Protections = repo.Protections
-	// conf.Spec = spec
+
+	conf.Spec = rs
+
 	return conf, nil
 }
 

@@ -6,15 +6,15 @@ import (
 )
 
 type RepositoryStatus struct {
-	ID               *int
-	Name             *string
-	Owner            *string
+	ID               int
+	Name             string
+	Owner            string
 	Description      *string
 	Homepage         *string
-	Private          *bool
-	AllowSquashMerge *bool
-	AllowMergeCommit *bool
-	AllowRebaseMerge *bool
+	Private          bool
+	AllowSquashMerge bool
+	AllowMergeCommit bool
+	AllowRebaseMerge bool
 
 	Topics      []string
 	Labels      []Label
@@ -31,21 +31,22 @@ func FindRepositoryStatus(owner string, name string) (*RepositoryStatus, error) 
 	status := new(RepositoryStatus)
 	status.Homepage = repo.Homepage
 	status.Description = repo.Description
-	status.Private = repo.Private
+	status.Private = repo.GetPrivate()
 	status.Topics = repo.Topics
-	status.AllowSquashMerge = repo.AllowSquashMerge
-	status.AllowMergeCommit = repo.AllowMergeCommit
-	status.AllowRebaseMerge = repo.AllowRebaseMerge
+	status.AllowSquashMerge = repo.GetAllowSquashMerge()
+	status.AllowMergeCommit = repo.GetAllowMergeCommit()
+	status.AllowRebaseMerge = repo.GetAllowRebaseMerge()
 
-	labels, err := findLabels(owner, name)
+	labels, err := findLabels(ctx, owner, name)
 	if err != nil {
 		return nil, err
 	}
 	for _, label := range labels {
 		status.Labels = append(status.Labels, Label{
-			Name:        label.Name,
+			ID:          label.GetID(),
+			Name:        label.GetName(),
 			Description: label.Description,
-			Color:       label.Color,
+			Color:       label.GetColor(),
 		})
 	}
 
@@ -60,7 +61,7 @@ func FindRepositoryStatus(owner string, name string) (*RepositoryStatus, error) 
 
 func (s *RepositoryStatus) Sync(ctx context.Context) error {
 	repo := new(github.Repository)
-	_, _, err := ghc.Repositories.Edit(ctx, *s.Owner, *s.Name, repo)
+	_, _, err := ghc.Repositories.Edit(ctx, s.Owner, s.Name, repo)
 	if err != nil {
 		return err
 	}
@@ -79,11 +80,4 @@ func (s *RepositoryStatus) Sync(ctx context.Context) error {
 	// TODO protections
 
 	return nil
-}
-
-type Label struct {
-	ID          *int
-	Name        *string
-	Description *string
-	Color       *string
 }
