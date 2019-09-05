@@ -3,6 +3,7 @@ package status
 import (
 	"context"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-github/v28/github"
 )
 
@@ -55,6 +56,10 @@ func FindRepositoryStatus(owner string, name string) (*RepositoryStatus, error) 
 	status.Protections = protections
 
 	return status, nil
+}
+
+func (s *RepositoryStatus) Diff(t *RepositoryStatus) string {
+	return cmp.Diff(s, t)
 }
 
 func (s *RepositoryStatus) Apply(ctx context.Context) error {

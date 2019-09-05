@@ -17,13 +17,33 @@ type RepositorySpec struct {
 	Protections []Protection `yaml:"protections,omitempty"`
 }
 
-func (rs *RepositorySpec) Patch(repo *status.RepositoryStatus) {
-	repo.Description = rs.Description
-	repo.Private = rs.Private
-	repo.Homepage = rs.Homepage
-	repo.AllowSquashMerge = rs.AllowSquashMerge
-	repo.AllowMergeCommit = rs.AllowMergeCommit
-	repo.AllowRebaseMerge = rs.AllowRebaseMerge
+func (sp *RepositorySpec) Patch(st *status.RepositoryStatus) {
+	if sp.Description != nil {
+		st.Description = sp.Description
+	}
+	if sp.Private != nil {
+		st.Private = sp.Private
+	}
+	if sp.Homepage != nil {
+		st.Homepage = sp.Homepage
+	}
+	if sp.AllowSquashMerge != nil {
+		st.AllowSquashMerge = sp.AllowSquashMerge
+	}
+	if sp.AllowMergeCommit != nil {
+		st.AllowMergeCommit = sp.AllowMergeCommit
+	}
+	if sp.AllowRebaseMerge != nil {
+		st.AllowRebaseMerge = sp.AllowRebaseMerge
+	}
+	if sp.Topics != nil {
+		st.Topics = sp.Topics
+	}
+	/*
+		if sp.Protections != nil {
+			st.Protections = sp.Protections
+		}
+	*/
 }
 
 type Label struct {

@@ -1,8 +1,9 @@
 package cmd
 
 import (
-	"fmt"
+	"context"
 
+	"github.com/shotat/ghrc/config"
 	"github.com/spf13/cobra"
 )
 
@@ -16,8 +17,15 @@ and usage of using your command. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("not implemented")
+	RunE: func(cmd *cobra.Command, args []string) error {
+		conf, err := config.LoadFromFile(filepath)
+		if err != nil {
+			return err
+		}
+
+		ctx := context.Background()
+
+		return conf.Plan(ctx)
 	},
 }
 
