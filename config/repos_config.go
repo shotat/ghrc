@@ -92,9 +92,10 @@ func (rc *RepositoryConfig) Plan(ctx context.Context) error {
 		return err
 	}
 
-	rc.Spec.Patch(repo2)
-	diff := repo.Diff(repo2)
-	fmt.Println(diff)
+	patch := rc.Spec.CalculatePatch(repo2)
+	// rc.Spec.Patch(repo2)
+	// diff := repo.Diff(repo2)
+	fmt.Println(patch)
 	return nil
 }
 
@@ -104,7 +105,7 @@ func (rc *RepositoryConfig) Apply(ctx context.Context) error {
 		return err
 	}
 
-	rc.Spec.Patch(repo)
+	// rc.Spec.Patch(repo)
 
 	return repo.Apply(ctx)
 }
