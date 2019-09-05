@@ -2,19 +2,20 @@ package status
 
 import (
 	"context"
+
 	"github.com/google/go-github/v28/github"
 )
 
 type RepositoryStatus struct {
-	ID               int
+	ID               int64
 	Name             string
 	Owner            string
 	Description      *string
 	Homepage         *string
-	Private          bool
-	AllowSquashMerge bool
-	AllowMergeCommit bool
-	AllowRebaseMerge bool
+	Private          *bool
+	AllowSquashMerge *bool
+	AllowMergeCommit *bool
+	AllowRebaseMerge *bool
 
 	Topics      []string
 	Labels      []Label
@@ -29,13 +30,16 @@ func FindRepositoryStatus(owner string, name string) (*RepositoryStatus, error) 
 	}
 	// Spec
 	status := new(RepositoryStatus)
+	status.ID = repo.GetID()
+	status.Name = repo.GetName()
+	status.Owner = repo.GetOwner().GetLogin()
 	status.Homepage = repo.Homepage
 	status.Description = repo.Description
-	status.Private = repo.GetPrivate()
+	status.Private = repo.Private
 	status.Topics = repo.Topics
-	status.AllowSquashMerge = repo.GetAllowSquashMerge()
-	status.AllowMergeCommit = repo.GetAllowMergeCommit()
-	status.AllowRebaseMerge = repo.GetAllowRebaseMerge()
+	status.AllowSquashMerge = repo.AllowSquashMerge
+	status.AllowMergeCommit = repo.AllowMergeCommit
+	status.AllowRebaseMerge = repo.AllowRebaseMerge
 
 	labels, err := findLabels(ctx, owner, name)
 	if err != nil {
@@ -59,8 +63,17 @@ func FindRepositoryStatus(owner string, name string) (*RepositoryStatus, error) 
 	return status, nil
 }
 
-func (s *RepositoryStatus) Sync(ctx context.Context) error {
+func (s *RepositoryStatus) Apply(ctx context.Context) error {
 	repo := new(github.Repository)
+
+	repo.Name = &s.Name
+	repo.Description = s.Description
+	repo.Homepage = s.Description
+	repo.Private = s.Private
+	repo.AllowRebaseMerge = s.AllowRebaseMerge
+	repo.AllowSquashMerge = s.AllowSquashMerge
+	repo.AllowMergeCommit = s.AllowMergeCommit
+
 	_, _, err := ghc.Repositories.Edit(ctx, s.Owner, s.Name, repo)
 	if err != nil {
 		return err

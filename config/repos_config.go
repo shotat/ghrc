@@ -16,6 +16,15 @@ type RepositoryConfig struct {
 	Spec     *spec.RepositorySpec         `yaml:"spec"`
 }
 
+func (c *RepositoryConfig) ToYAML() (string, error) {
+	buf := bytes.NewBuffer(nil)
+	err := yaml.NewEncoder(buf).Encode(c)
+	if err != nil {
+		return "", err
+	}
+	return buf.String(), nil
+}
+
 func LoadFromFile(path string) (*RepositoryConfig, error) {
 	buf, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -82,5 +91,5 @@ func (rc *RepositoryConfig) Apply(ctx context.Context) error {
 
 	rc.Spec.Patch(repo)
 
-	return nil
+	return repo.Apply(ctx)
 }

@@ -4,11 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"bytes"
-
 	"github.com/shotat/ghrc/config"
 	"github.com/spf13/cobra"
-	yaml "gopkg.in/yaml.v2"
 )
 
 // importCmd represents the import command
@@ -26,19 +23,21 @@ to quickly create a Cobra application.`,
 		if err != nil {
 			return err
 		}
-		repo, err := cmd.Flags().GetString("repo")
+		name, err := cmd.Flags().GetString("name")
 		if err != nil {
 			return err
 		}
 		ctx := context.Background()
-		conf, err := config.Import(ctx, owner, repo)
+		conf, err := config.Import(ctx, owner, name)
 		if err != nil {
 			return err
 		}
 
-		buf := bytes.NewBuffer(nil)
-		err = yaml.NewEncoder(buf).Encode(conf)
-		fmt.Println(buf.String())
+		yaml, err := conf.ToYAML()
+		if err != nil {
+			return err
+		}
+		fmt.Println(yaml)
 		return nil
 	},
 }
@@ -46,7 +45,7 @@ to quickly create a Cobra application.`,
 func init() {
 	rootCmd.AddCommand(importCmd)
 
-	importCmd.Flags().String("repo", "", "repository name")
+	importCmd.Flags().String("name", "", "repository name")
 	importCmd.Flags().String("owner", "", "owner name")
 
 	// Here you will define your flags and configuration settings.

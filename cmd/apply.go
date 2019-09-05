@@ -28,6 +28,7 @@ to quickly create a Cobra application.`,
 		}
 
 		ctx := context.Background()
+
 		return conf.Apply(ctx)
 	},
 }
