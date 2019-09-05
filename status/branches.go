@@ -1,4 +1,4 @@
-package ghrc
+package status
 
 import (
 	"context"
@@ -6,44 +6,44 @@ import (
 )
 
 type Protection struct {
-	Branch                     *string                     `yaml:"branch"`
-	RequiredStatusCheck        *RequiredStatusCheck        `yaml:"requiredStatusCheck"`
-	EnforceAdmins              *bool                       `yaml:"enforceAdmins"`
-	RequiredPullRequestReviews *RequiredPullRequestReviews `yaml:"requiredPullRequestReviews"`
-	Restrictions               *Restrictions               `yaml:"restrictions"`
+	Branch                     *string
+	RequiredStatusCheck        *RequiredStatusCheck
+	EnforceAdmins              *bool
+	RequiredPullRequestReviews *RequiredPullRequestReviews
+	Restrictions               *Restrictions
 }
 
 type RequiredPullRequestReviews struct {
-	DismissalRestrictions        *Restrictions `yaml:"dismissalRestrictions"`
-	DismissStaleReviews          bool          `yaml:"dismissStaleReviews"`
-	RequireCodeOwnerReviews      bool          `yaml:"requireCodeOwnerReviews"`
-	RequiredApprovingReviewCount int           `yaml:"requiredApprovingReviewCount"`
+	DismissalRestrictions        *Restrictions
+	DismissStaleReviews          bool
+	RequireCodeOwnerReviews      bool
+	RequiredApprovingReviewCount int
 }
 
 type Restrictions struct {
-	Users []string `yaml:"users"`
-	Teams []string `yaml:"teams"`
+	Users []string
+	Teams []string
 }
 
 type RequiredStatusCheck struct {
-	Strict   bool     `yaml:"strict"`
-	Contexts []string `yaml:"contexts"`
+	Strict   bool
+	Contexts []string
 }
 
-func findProtections(meta *RepositoryMetadata) ([]Protection, error) {
+func findProtections(owner string, repo string) ([]Protection, error) {
 	ctx := context.Background()
 	protected := true
 	opt := &github.BranchListOptions{
 		Protected: &protected,
 	}
-	protectedBranches, _, err := ghc.Repositories.ListBranches(ctx, meta.Owner, meta.Name, opt)
+	protectedBranches, _, err := ghc.Repositories.ListBranches(ctx, owner, repo, opt)
 	if err != nil {
 		return nil, err
 	}
 
 	protections := make([]Protection, len(protectedBranches))
 	for i, pb := range protectedBranches {
-		p, _, err := ghc.Repositories.GetBranchProtection(ctx, meta.Owner, meta.Name, pb.GetName())
+		p, _, err := ghc.Repositories.GetBranchProtection(ctx, owner, repo, pb.GetName())
 		if err != nil {
 			return nil, err
 		}

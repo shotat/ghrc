@@ -1,7 +1,9 @@
 package cmd
 
 import (
-	"github.com/shotat/ghrc"
+	"context"
+
+	"github.com/shotat/ghrc/config"
 	"github.com/spf13/cobra"
 )
 
@@ -20,12 +22,14 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		conf, err := ghrc.LoadRepositoryConfigFromFile(filepath)
+		conf, err := config.LoadFromFile(filepath)
 		if err != nil {
 			return err
 		}
 
-		return conf.Apply()
+		ctx := context.Background()
+
+		return conf.Apply(ctx)
 	},
 }
 

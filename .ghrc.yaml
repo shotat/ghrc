@@ -15,9 +15,9 @@ spec:
     - name: "skip_ci"
       description: ""
       color: "000000"
-  allowRebaseMerge: true
+  allowRebaseMerge: false
   allowSquashMerge: true
-  allowMergeCommit: true
+  allowMergeCommit: null
   protections:
     branch: master
     requiredStatusChecks:

@@ -14,3 +14,25 @@ Repository configuration includes
 
 - `GHRC_GITHUB_TOKEN`
 - `GHRC_GITHUB_API` (default: "https://api.github.com")
+
+## Usage
+
+### Import an existing repository configuration
+
+```sh
+# ghrc import --owner <repository owner name> --name <repository name>
+$ ghrc import --owner shotat --name ghrc
+```
+
+### Check expected changes without changing the actual configuration.
+
+```sh
+$ ghrc plan
+```
+
+### Apply specs to the actual configuration.
+
+```sh
+$ ghrc apply
+```
+
