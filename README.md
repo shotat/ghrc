@@ -17,20 +17,20 @@ Repository configuration includes
 
 ## Usage
 
-### Import an existing repository configuration
+### Import an existing repository state
 
 ```sh
 # ghrc import --owner <repository owner name> --name <repository name>
 $ ghrc import --owner shotat --name ghrc
 ```
 
-### Check expected changes without changing the actual configuration.
+### Check expected changes without changing the actual state.
 
 ```sh
 $ ghrc plan
 ```
 
-### Apply specs to the actual configuration.
+### Apply specs to the actual state.
 
 ```sh
 $ ghrc apply

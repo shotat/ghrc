@@ -39,11 +39,42 @@ func (sp *RepositorySpec) Patch(st *status.RepositoryStatus) {
 	if sp.Topics != nil {
 		st.Topics = sp.Topics
 	}
-	/*
-		if sp.Protections != nil {
-			st.Protections = sp.Protections
+	if sp.Labels != nil {
+		labels := make([]status.Label, len(sp.Labels))
+		for i, spl := range sp.Labels {
+			labels[i] = func() status.Label {
+				for _, stl := range st.Labels {
+					if stl.Name == spl.Name {
+						// update existing label
+						stl.Name = spl.Name
+						stl.Color = spl.Color
+						if spl.Description != nil {
+							stl.Description = spl.Description
+						}
+						return stl
+					}
+				}
+				// new label
+				return status.Label{
+					ID:          nil,
+					Name:        spl.Name,
+					Color:       spl.Color,
+					Description: spl.Description,
+				}
+			}()
 		}
-	*/
+		st.Labels = labels
+	}
+
+	if sp.Protections != nil {
+		protections := make([]status.Protection, len(sp.Protections))
+		for i, p := range sp.Protections {
+			protections[i] = status.Protection{
+				Branch: p.Branch,
+			}
+		}
+		st.Protections = protections
+	}
 }
 
 type Label struct {

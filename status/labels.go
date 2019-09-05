@@ -5,7 +5,7 @@ import (
 )
 
 type Label struct {
-	ID          int64
+	ID          *int64
 	Name        string
 	Description *string
 	Color       string
@@ -19,7 +19,7 @@ func findLabels(ctx context.Context, owner string, repo string) ([]Label, error)
 	labels := make([]Label, len(ghLabels))
 	for i, label := range ghLabels {
 		labels[i] = Label{
-			ID:          label.GetID(),
+			ID:          label.ID,
 			Name:        label.GetName(),
 			Description: label.Description,
 			Color:       label.GetColor(),
