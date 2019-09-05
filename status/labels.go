@@ -2,8 +2,6 @@ package status
 
 import (
 	"context"
-
-	"github.com/google/go-github/v28/github"
 )
 
 type Label struct {
@@ -13,7 +11,19 @@ type Label struct {
 	Color       string
 }
 
-func findLabels(ctx context.Context, owner string, repo string) ([]*github.Label, error) {
-	labels, _, err := ghc.Issues.ListLabels(ctx, owner, repo, nil)
-	return labels, err
+func findLabels(ctx context.Context, owner string, repo string) ([]Label, error) {
+	ghLabels, _, err := ghc.Issues.ListLabels(ctx, owner, repo, nil)
+	if err != nil {
+		return nil, err
+	}
+	labels := make([]Label, len(ghLabels))
+	for i, label := range ghLabels {
+		labels[i] = Label{
+			ID:          label.GetID(),
+			Name:        label.GetName(),
+			Description: label.Description,
+			Color:       label.GetColor(),
+		}
+	}
+	return labels, nil
 }
