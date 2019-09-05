@@ -68,10 +68,25 @@ func (sp *RepositorySpec) Patch(st *status.RepositoryStatus) {
 
 	if sp.Protections != nil {
 		protections := make([]status.Protection, len(sp.Protections))
-		for i, p := range sp.Protections {
-			protections[i] = status.Protection{
-				Branch: p.Branch,
-			}
+		for i, spp := range sp.Protections {
+			protections[i] = func() status.Protection {
+				for _, stp := range st.Protections {
+					if stp.Branch == spp.Branch {
+						if spp.EnforceAdmins != nil {
+							stp.EnforceAdmins = spp.EnforceAdmins
+							return stp
+						}
+					}
+				}
+
+				// new protection
+				return status.Protection{
+					Branch:        spp.Branch,
+					EnforceAdmins: spp.EnforceAdmins,
+					// RequiredStatusCheck:        spp.RequiredStatusCheck,
+					// RequiredPullRequestReviews: *spp.RequiredPullRequestReviews,
+				}
+			}()
 		}
 		st.Protections = protections
 	}
