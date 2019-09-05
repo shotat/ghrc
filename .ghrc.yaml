@@ -19,7 +19,7 @@ spec:
   allowSquashMerge: true
   allowMergeCommit: null
   protections:
-    branch: master
+  - branch: master
     requiredStatusChecks:
       strict: true
       contexts: []

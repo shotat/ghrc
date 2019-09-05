@@ -3,6 +3,8 @@ package config
 import (
 	"bytes"
 	"context"
+	"fmt"
+	"github.com/jinzhu/copier"
 	"io/ioutil"
 
 	"github.com/shotat/ghrc/metadata"
@@ -80,6 +82,19 @@ func Import(ctx context.Context, owner string, name string) (*RepositoryConfig, 
 
 // TODO
 func (rc *RepositoryConfig) Plan(ctx context.Context) error {
+	repo, err := status.FindRepositoryStatus(rc.Metadata.Owner, rc.Metadata.Name)
+	if err != nil {
+		return err
+	}
+
+	repo2 := new(status.RepositoryStatus)
+	if err := copier.Copy(repo2, repo); err != nil {
+		return err
+	}
+
+	rc.Spec.Patch(repo2)
+	diff := repo.Diff(repo2)
+	fmt.Println(diff)
 	return nil
 }
 

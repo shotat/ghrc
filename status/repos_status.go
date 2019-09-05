@@ -3,6 +3,7 @@ package status
 import (
 	"context"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-github/v28/github"
 )
 
@@ -29,30 +30,24 @@ func FindRepositoryStatus(owner string, name string) (*RepositoryStatus, error) 
 		return nil, err
 	}
 	// Spec
-	status := new(RepositoryStatus)
-	status.ID = repo.GetID()
-	status.Name = repo.GetName()
-	status.Owner = repo.GetOwner().GetLogin()
-	status.Homepage = repo.Homepage
-	status.Description = repo.Description
-	status.Private = repo.Private
-	status.Topics = repo.Topics
-	status.AllowSquashMerge = repo.AllowSquashMerge
-	status.AllowMergeCommit = repo.AllowMergeCommit
-	status.AllowRebaseMerge = repo.AllowRebaseMerge
+	status := &RepositoryStatus{
+		ID:               repo.GetID(),
+		Name:             repo.GetName(),
+		Owner:            repo.GetOwner().GetLogin(),
+		Homepage:         repo.Homepage,
+		Description:      repo.Description,
+		Private:          repo.Private,
+		Topics:           repo.Topics,
+		AllowSquashMerge: repo.AllowSquashMerge,
+		AllowMergeCommit: repo.AllowMergeCommit,
+		AllowRebaseMerge: repo.AllowRebaseMerge,
+	}
 
 	labels, err := findLabels(ctx, owner, name)
 	if err != nil {
 		return nil, err
 	}
-	for _, label := range labels {
-		status.Labels = append(status.Labels, Label{
-			ID:          label.GetID(),
-			Name:        label.GetName(),
-			Description: label.Description,
-			Color:       label.GetColor(),
-		})
-	}
+	status.Labels = labels
 
 	protections, err := findProtections(owner, name)
 	if err != nil {
@@ -61,6 +56,10 @@ func FindRepositoryStatus(owner string, name string) (*RepositoryStatus, error) 
 	status.Protections = protections
 
 	return status, nil
+}
+
+func (s *RepositoryStatus) Diff(t *RepositoryStatus) string {
+	return cmp.Diff(s, t)
 }
 
 func (s *RepositoryStatus) Apply(ctx context.Context) error {
