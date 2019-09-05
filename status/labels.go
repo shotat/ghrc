@@ -2,13 +2,41 @@ package status
 
 import (
 	"context"
+	"github.com/google/go-github/v28/github"
 )
 
 type Label struct {
+	repoOwner   string
+	repoName    string
 	ID          *int64
 	Name        string
 	Description *string
 	Color       string
+}
+
+func (l *Label) Create(ctx context.Context) error {
+	ghl := &github.Label{
+		Name:        &l.Name,
+		Color:       &l.Color,
+		Description: l.Description,
+	}
+	_, _, err := ghc.Issues.CreateLabel(ctx, l.repoOwner, l.repoName, ghl)
+	return err
+}
+
+func (l *Label) Change(ctx context.Context) error {
+	ghl := &github.Label{
+		Name:        &l.Name,
+		Color:       &l.Color,
+		Description: l.Description,
+	}
+	_, _, err := ghc.Issues.EditLabel(ctx, l.repoOwner, l.repoName, l.Name, ghl)
+	return err
+}
+
+func (l *Label) Destroy(ctx context.Context) error {
+	_, err := ghc.Issues.DeleteLabel(ctx, l.repoOwner, l.repoName, l.Name)
+	return err
 }
 
 func findLabels(ctx context.Context, owner string, repo string) ([]Label, error) {
