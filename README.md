@@ -23,3 +23,16 @@ Repository configuration includes
 # ghrc import --owner <repository owner name> --name <repository name>
 $ ghrc import --owner shotat --name ghrc
 ```
+
+### Check expected changes without changing the actual configuration.
+
+```sh
+$ ghrc plan
+```
+
+### Apply specs to the actual configuration.
+
+```sh
+$ ghrc apply
+```
+
