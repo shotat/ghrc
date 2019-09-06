@@ -4,10 +4,12 @@ GHRC is a tool for managing **G**it**H**ub **R**epository **C**onfigurations in 
 
 Repository configuration includes
 
-- Visibility
+
 - Labels
-- Topics
 - Protected Branches
+- Visibility(private or public)
+- Merging Strategies
+- Topics
 - Description
 
 ## Environment Variables
@@ -17,7 +19,7 @@ Repository configuration includes
 
 ## Usage
 
-### Import an existing repository state
+### Import an existing repository state.
 
 ```sh
 # ghrc import --owner <repository owner name> --name <repository name>
