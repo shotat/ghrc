@@ -30,7 +30,7 @@ type RequiredStatusCheck struct {
 	Contexts []string
 }
 
-func findProtections(owner string, repo string) ([]Protection, error) {
+func FindProtections(owner string, repo string) ([]Protection, error) {
 	ctx := context.Background()
 	protected := true
 	opt := &github.BranchListOptions{

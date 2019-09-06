@@ -2,16 +2,42 @@ package status
 
 import (
 	"context"
+	"github.com/google/go-github/v28/github"
 )
 
 type Label struct {
-	ID          int64
+	ID          *int64
 	Name        string
 	Description *string
 	Color       string
 }
 
-func findLabels(ctx context.Context, owner string, repo string) ([]Label, error) {
+func (l *Label) Create(ctx context.Context, repoOwner string, repoName string) error {
+	ghl := &github.Label{
+		Name:        &l.Name,
+		Color:       &l.Color,
+		Description: l.Description,
+	}
+	_, _, err := ghc.Issues.CreateLabel(ctx, repoOwner, repoName, ghl)
+	return err
+}
+
+func (l *Label) Update(ctx context.Context, repoOwner string, repoName string) error {
+	ghl := &github.Label{
+		Name:        &l.Name,
+		Color:       &l.Color,
+		Description: l.Description,
+	}
+	_, _, err := ghc.Issues.EditLabel(ctx, repoOwner, repoName, l.Name, ghl)
+	return err
+}
+
+func (l *Label) Destroy(ctx context.Context, repoOwner string, repoName string) error {
+	_, err := ghc.Issues.DeleteLabel(ctx, repoOwner, repoName, l.Name)
+	return err
+}
+
+func FindLabels(ctx context.Context, owner string, repo string) ([]Label, error) {
 	ghLabels, _, err := ghc.Issues.ListLabels(ctx, owner, repo, nil)
 	if err != nil {
 		return nil, err
@@ -19,7 +45,7 @@ func findLabels(ctx context.Context, owner string, repo string) ([]Label, error)
 	labels := make([]Label, len(ghLabels))
 	for i, label := range ghLabels {
 		labels[i] = Label{
-			ID:          label.GetID(),
+			ID:          label.ID,
 			Name:        label.GetName(),
 			Description: label.Description,
 			Color:       label.GetColor(),

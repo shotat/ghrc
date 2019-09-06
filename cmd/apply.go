@@ -14,7 +14,7 @@ const (
 // applyCmd represents the apply command
 var applyCmd = &cobra.Command{
 	Use:   "apply",
-	Short: "A brief description of your command",
+	Short: "Apply specs to the actual state",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 

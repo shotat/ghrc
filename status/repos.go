@@ -7,7 +7,7 @@ import (
 	"github.com/google/go-github/v28/github"
 )
 
-type RepositoryStatus struct {
+type Repo struct {
 	ID               int64
 	Name             string
 	Owner            string
@@ -17,20 +17,16 @@ type RepositoryStatus struct {
 	AllowSquashMerge *bool
 	AllowMergeCommit *bool
 	AllowRebaseMerge *bool
-
-	Topics      []string
-	Labels      []Label
-	Protections []Protection
+	Topics           []string
 }
 
-func FindRepositoryStatus(owner string, name string) (*RepositoryStatus, error) {
+func FindRepo(owner string, name string) (*Repo, error) {
 	ctx := context.Background()
 	repo, _, err := ghc.Repositories.Get(ctx, owner, name)
 	if err != nil {
 		return nil, err
 	}
-	// Spec
-	status := &RepositoryStatus{
+	return &Repo{
 		ID:               repo.GetID(),
 		Name:             repo.GetName(),
 		Owner:            repo.GetOwner().GetLogin(),
@@ -41,55 +37,32 @@ func FindRepositoryStatus(owner string, name string) (*RepositoryStatus, error) 
 		AllowSquashMerge: repo.AllowSquashMerge,
 		AllowMergeCommit: repo.AllowMergeCommit,
 		AllowRebaseMerge: repo.AllowRebaseMerge,
-	}
-
-	labels, err := findLabels(ctx, owner, name)
-	if err != nil {
-		return nil, err
-	}
-	status.Labels = labels
-
-	protections, err := findProtections(owner, name)
-	if err != nil {
-		return nil, err
-	}
-	status.Protections = protections
-
-	return status, nil
+	}, nil
 }
 
-func (s *RepositoryStatus) Diff(t *RepositoryStatus) string {
+func (s *Repo) Diff(t *Repo) string {
 	return cmp.Diff(s, t)
 }
 
-func (s *RepositoryStatus) Apply(ctx context.Context) error {
+func (s *Repo) Update(ctx context.Context, repoOwner string, repoName string) error {
 	repo := new(github.Repository)
-
 	repo.Name = &s.Name
 	repo.Description = s.Description
-	repo.Homepage = s.Description
+	repo.Homepage = s.Homepage
 	repo.Private = s.Private
 	repo.AllowRebaseMerge = s.AllowRebaseMerge
 	repo.AllowSquashMerge = s.AllowSquashMerge
 	repo.AllowMergeCommit = s.AllowMergeCommit
 
-	_, _, err := ghc.Repositories.Edit(ctx, s.Owner, s.Name, repo)
-	if err != nil {
+	if _, _, err := ghc.Repositories.Edit(ctx, repoOwner, repoName, repo); err != nil {
 		return err
 	}
 
-	/*
-		if rc.Spec.Topics != nil {
-			_, _, err = ghc.Repositories.ReplaceAllTopics(ctx, rc.Metadata.Owner, rc.Metadata.Name, rc.Spec.Topics)
-			if err != nil {
-				return err
-			}
+	if s.Topics != nil {
+		if _, _, err := ghc.Repositories.ReplaceAllTopics(ctx, s.Owner, s.Name, s.Topics); err != nil {
+			return err
 		}
-	*/
-
-	// TODO label
-
-	// TODO protections
+	}
 
 	return nil
 }
