@@ -16,12 +16,6 @@ type Repo struct {
 	Topics []string `yaml:"topics,omitempty"`
 }
 
-type Spec struct {
-	Repo        *Repo        `yaml:"repo,omitempty"`
-	Labels      []Label      `yaml:"labels,omitempty"`
-	Protections []Protection `yaml:"protections,omitempty"`
-}
-
 func (sp *Repo) GetRepoChange(st *status.Repo) *change.ReposChange {
 	after := &status.Repo{
 		Description:      st.Description,

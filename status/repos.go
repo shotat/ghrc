@@ -45,7 +45,7 @@ func (s *Repo) Diff(t *Repo) string {
 	return cmp.Diff(s, t)
 }
 
-func (s *Repo) Apply(ctx context.Context) error {
+func (s *Repo) Update(ctx context.Context) error {
 	repo := new(github.Repository)
 
 	repo.Name = &s.Name
@@ -61,18 +61,7 @@ func (s *Repo) Apply(ctx context.Context) error {
 		return err
 	}
 
-	/*
-		if rc.Spec.Topics != nil {
-			_, _, err = ghc.Repositories.ReplaceAllTopics(ctx, rc.Metadata.Owner, rc.Metadata.Name, rc.Spec.Topics)
-			if err != nil {
-				return err
-			}
-		}
-	*/
-
-	// TODO label
-
-	// TODO protections
+	// TODO topic
 
 	return nil
 }

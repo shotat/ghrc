@@ -3,8 +3,10 @@ package config
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io/ioutil"
 
+	"github.com/shotat/ghrc/change"
 	"github.com/shotat/ghrc/metadata"
 	"github.com/shotat/ghrc/spec"
 	"github.com/shotat/ghrc/status"
@@ -82,34 +84,46 @@ func Import(ctx context.Context, owner string, name string) (*RepositoryConfig, 
 	return conf, nil
 }
 
-// TODO
-func (rc *RepositoryConfig) Plan(ctx context.Context) error {
-	/*
-		repo, err := status.FindRepositoryStatus(rc.Metadata.Owner, rc.Metadata.Name)
-		if err != nil {
-			return err
-		}
+func (rc *RepositoryConfig) calculateChangeSet(ctx context.Context) (change.ChangeSet, error) {
+	repo, err := status.FindRepo(rc.Metadata.Owner, rc.Metadata.Name)
+	if err != nil {
+		return nil, err
+	}
+	labels, err := status.FindLabels(ctx, rc.Metadata.Owner, rc.Metadata.Name)
+	if err != nil {
+		return nil, err
+	}
 
-		repo2 := new(status.RepositoryStatus)
-		if err := copier.Copy(repo2, repo); err != nil {
-			return err
-		}
-
-		patch := rc.Spec.CalculatePatch(repo2)
-		// rc.Spec.Patch(repo2)
-		// diff := repo.Diff(repo2)
-		fmt.Println(patch)
-	*/
-	return nil
+	changeSet := make(change.ChangeSet, 0)
+	changeSet = append(changeSet, rc.Spec.Repo.GetRepoChange(repo))
+	for _, labelChange := range rc.Spec.Labels.GetLabelsChangeSet(labels) {
+		changeSet = append(changeSet, labelChange)
+	}
+	return changeSet, nil
 }
 
-func (rc *RepositoryConfig) Apply(ctx context.Context) error {
-	repo, err := status.FindRepo(rc.Metadata.Owner, rc.Metadata.Name)
+func (rc *RepositoryConfig) Plan(ctx context.Context) error {
+	cs, err := rc.calculateChangeSet(ctx)
 	if err != nil {
 		return err
 	}
 
-	// rc.Spec.Patch(repo)
+	for _, c := range cs {
+		fmt.Println(c)
+	}
+	return nil
+}
 
-	return repo.Apply(ctx)
+func (rc *RepositoryConfig) Apply(ctx context.Context) error {
+	cs, err := rc.calculateChangeSet(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, c := range cs {
+		if err := c.Apply(ctx); err != nil {
+			return err
+		}
+	}
+	return nil
 }

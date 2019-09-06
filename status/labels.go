@@ -24,7 +24,7 @@ func (l *Label) Create(ctx context.Context) error {
 	return err
 }
 
-func (l *Label) Change(ctx context.Context) error {
+func (l *Label) Update(ctx context.Context) error {
 	ghl := &github.Label{
 		Name:        &l.Name,
 		Color:       &l.Color,

@@ -13,13 +13,13 @@ type Label struct {
 
 type Labels []Label
 
-func (sp Labels) GetLabelsChangeSet(st []status.Label) []change.LabelChange {
+func (sp Labels) GetLabelsChangeSet(st []status.Label) []*change.LabelChange {
 	if sp == nil {
 		return nil
 	}
-	changes := make([]change.LabelChange, 0)
+	changes := make([]*change.LabelChange, 0)
 	for _, spl := range sp {
-		func() {
+		func(spl Label) {
 			for _, stl := range st {
 				if stl.Name == spl.Name {
 					// update existing label
@@ -31,7 +31,7 @@ func (sp Labels) GetLabelsChangeSet(st []status.Label) []change.LabelChange {
 					if spl.Description != nil {
 						after.Description = spl.Description
 					}
-					changes = append(changes, change.LabelChange{
+					changes = append(changes, &change.LabelChange{
 						Action: change.Update,
 						Before: &stl,
 						After:  &after,
@@ -40,7 +40,7 @@ func (sp Labels) GetLabelsChangeSet(st []status.Label) []change.LabelChange {
 				}
 			}
 			// new label
-			changes = append(changes, change.LabelChange{
+			changes = append(changes, &change.LabelChange{
 				Action: change.Create,
 				Before: nil,
 				After: &status.Label{
@@ -50,10 +50,10 @@ func (sp Labels) GetLabelsChangeSet(st []status.Label) []change.LabelChange {
 				},
 			})
 			return
-		}()
+		}(spl)
 	}
 	for _, stl := range st {
-		func() {
+		func(stl status.Label) {
 			for _, spl := range sp {
 				if stl.Name == spl.Name {
 					return
@@ -61,13 +61,12 @@ func (sp Labels) GetLabelsChangeSet(st []status.Label) []change.LabelChange {
 			}
 
 			// deletion
-			changes = append(changes, change.LabelChange{
+			changes = append(changes, &change.LabelChange{
 				Action: change.Delete,
 				Before: &stl,
 				After:  nil,
 			})
-			return
-		}()
+		}(stl)
 	}
 	return changes
 }

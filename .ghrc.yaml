@@ -2,12 +2,16 @@ metadata:
   owner: shotat
   name: ghrc
 spec:
-  description: I'm awesome!!!
-  homepage: ""
-  private: false
-  topics:
+  repo:
+    description: I'm awesome!!!
+    homepage: ""
+    private: false
+    topics:
     - go
     - github
+    allowRebaseMerge: false
+    allowSquashMerge: true
+    allowMergeCommit: null
   labels:
     - name: "bug :bug:"
       description: "Small bug fix required"
@@ -17,9 +21,6 @@ spec:
       color: "000000"
     - name: duplicate
       color: "123456"
-  allowRebaseMerge: false
-  allowSquashMerge: true
-  allowMergeCommit: null
   protections:
   - branch: master
     requiredStatusChecks:
