@@ -5,7 +5,7 @@ import (
 	"github.com/shotat/ghrc/state"
 )
 
-func GetProtectionsChange(st []state.Protection, sp *spec.Repo) *ReposChange {
+func GetProtectionsChange(st []state.Protection, sp *spec.Repo) *RepoChange {
 	/*
 		if sp.Protections != nil {
 			protectionsPatch := new(state.BulkPatch)
