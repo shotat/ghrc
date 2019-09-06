@@ -46,7 +46,7 @@ func (c *ReposChange) String() string {
 		buf.WriteString(fmt.Sprintf("\tallowSquashMerge\t%v\n", *c.After.AllowSquashMerge))
 		buf.WriteString(fmt.Sprintf("\tallowMergeCommit\t%v\n", *c.After.AllowMergeCommit))
 		buf.WriteString(fmt.Sprintf("\tallowRebaseMerge\t%v\n", *c.After.AllowRebaseMerge))
-		// buf.WriteString(fmt.Sprintf("\ttopics\t%v\n", c.After.Topics))
+		buf.WriteString(fmt.Sprintf("\ttopics\t%v\n", c.After.Topics))
 	}
 	return buf.String()
 }

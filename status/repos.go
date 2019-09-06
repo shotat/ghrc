@@ -17,8 +17,7 @@ type Repo struct {
 	AllowSquashMerge *bool
 	AllowMergeCommit *bool
 	AllowRebaseMerge *bool
-
-	Topics []string
+	Topics           []string
 }
 
 func FindRepo(owner string, name string) (*Repo, error) {
@@ -47,21 +46,23 @@ func (s *Repo) Diff(t *Repo) string {
 
 func (s *Repo) Update(ctx context.Context) error {
 	repo := new(github.Repository)
-
 	repo.Name = &s.Name
 	repo.Description = s.Description
-	repo.Homepage = s.Description
+	repo.Homepage = s.Homepage
 	repo.Private = s.Private
 	repo.AllowRebaseMerge = s.AllowRebaseMerge
 	repo.AllowSquashMerge = s.AllowSquashMerge
 	repo.AllowMergeCommit = s.AllowMergeCommit
 
-	_, _, err := ghc.Repositories.Edit(ctx, s.Owner, s.Name, repo)
-	if err != nil {
+	if _, _, err := ghc.Repositories.Edit(ctx, s.Owner, s.Name, repo); err != nil {
 		return err
 	}
 
-	// TODO topic
+	if s.Topics != nil {
+		if _, _, err := ghc.Repositories.ReplaceAllTopics(ctx, s.Owner, s.Name, s.Topics); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
