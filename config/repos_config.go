@@ -13,12 +13,12 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-type RepositoryConfig struct {
+type Config struct {
 	Metadata *metadata.Metadata `yaml:"metadata"`
 	Spec     *spec.Spec         `yaml:"spec"`
 }
 
-func (c *RepositoryConfig) ToYAML() (string, error) {
+func (c *Config) ToYAML() (string, error) {
 	buf := bytes.NewBuffer(nil)
 	err := yaml.NewEncoder(buf).Encode(c)
 	if err != nil {
@@ -27,20 +27,20 @@ func (c *RepositoryConfig) ToYAML() (string, error) {
 	return buf.String(), nil
 }
 
-func LoadFromFile(path string) (*RepositoryConfig, error) {
+func LoadFromFile(path string) (*Config, error) {
 	buf, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
-	conf := new(RepositoryConfig)
+	conf := new(Config)
 	if err := yaml.NewDecoder(bytes.NewReader(buf)).Decode(conf); err != nil {
 		return nil, err
 	}
 	return conf, nil
 }
 
-func Import(ctx context.Context, owner string, name string) (*RepositoryConfig, error) {
-	conf := new(RepositoryConfig)
+func Import(ctx context.Context, owner string, name string) (*Config, error) {
+	conf := new(Config)
 	meta := &metadata.Metadata{
 		Owner: owner,
 		Name:  name,
@@ -48,7 +48,7 @@ func Import(ctx context.Context, owner string, name string) (*RepositoryConfig, 
 
 	conf.Metadata = meta
 
-	repo, err := state.FindRepo(owner, name)
+	repo, err := state.FindRepo(ctx, owner, name)
 	if err != nil {
 		return nil, err
 	}
@@ -84,8 +84,8 @@ func Import(ctx context.Context, owner string, name string) (*RepositoryConfig, 
 	return conf, nil
 }
 
-func (rc *RepositoryConfig) calculateChangeSet(ctx context.Context) (change.ChangeSet, error) {
-	repo, err := state.FindRepo(rc.Metadata.Owner, rc.Metadata.Name)
+func (rc *Config) calculateChangeSet(ctx context.Context) (change.ChangeSet, error) {
+	repo, err := state.FindRepo(ctx, rc.Metadata.Owner, rc.Metadata.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +102,7 @@ func (rc *RepositoryConfig) calculateChangeSet(ctx context.Context) (change.Chan
 	return changeSet, nil
 }
 
-func (rc *RepositoryConfig) Plan(ctx context.Context) error {
+func (rc *Config) Plan(ctx context.Context) error {
 	cs, err := rc.calculateChangeSet(ctx)
 	if err != nil {
 		return err
@@ -114,7 +114,7 @@ func (rc *RepositoryConfig) Plan(ctx context.Context) error {
 	return nil
 }
 
-func (rc *RepositoryConfig) Apply(ctx context.Context) error {
+func (rc *Config) Apply(ctx context.Context) error {
 	cs, err := rc.calculateChangeSet(ctx)
 	if err != nil {
 		return err

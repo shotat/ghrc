@@ -3,7 +3,6 @@ package state
 import (
 	"context"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-github/v28/github"
 )
 
@@ -20,8 +19,7 @@ type Repo struct {
 	Topics           []string
 }
 
-func FindRepo(owner string, name string) (*Repo, error) {
-	ctx := context.Background()
+func FindRepo(ctx context.Context, owner string, name string) (*Repo, error) {
 	repo, _, err := ghc.Repositories.Get(ctx, owner, name)
 	if err != nil {
 		return nil, err
@@ -38,10 +36,6 @@ func FindRepo(owner string, name string) (*Repo, error) {
 		AllowMergeCommit: repo.AllowMergeCommit,
 		AllowRebaseMerge: repo.AllowRebaseMerge,
 	}, nil
-}
-
-func (s *Repo) Diff(t *Repo) string {
-	return cmp.Diff(s, t)
 }
 
 func (s *Repo) Update(ctx context.Context, repoOwner string, repoName string) error {
