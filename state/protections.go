@@ -1,4 +1,4 @@
-package status
+package state
 
 import (
 	"context"
@@ -30,8 +30,7 @@ type RequiredStatusCheck struct {
 	Contexts []string
 }
 
-func FindProtections(owner string, repo string) ([]Protection, error) {
-	ctx := context.Background()
+func FindProtections(ctx context.Context, owner string, repo string) ([]Protection, error) {
 	protected := true
 	opt := &github.BranchListOptions{
 		Protected: &protected,

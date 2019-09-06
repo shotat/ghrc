@@ -5,9 +5,7 @@ go 1.13
 replace github.com/google/go-github/v28 => github.com/shotat/go-github/v28 v28.0.3-alpha
 
 require (
-	github.com/google/go-cmp v0.3.1
 	github.com/google/go-github/v28 v28.0.1
-	github.com/jinzhu/copier v0.0.0-20190625015134-976e0346caa8
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/viper v1.4.0
