@@ -68,44 +68,46 @@ func Import(ctx context.Context, owner string, name string) (*Config, error) {
 	return conf, nil
 }
 
-func (rc *Config) calculateChangeSet(ctx context.Context) (change.ChangeSet, error) {
-	repo, err := state.FindRepo(ctx, rc.Metadata.Owner, rc.Metadata.Name)
+func (c *Config) calculateChangeSet(ctx context.Context) (change.ChangeSet, error) {
+	repo, err := state.FindRepo(ctx, c.Metadata.Owner, c.Metadata.Name)
 	if err != nil {
 		return nil, err
 	}
-	labels, err := state.FindLabels(ctx, rc.Metadata.Owner, rc.Metadata.Name)
+	labels, err := state.FindLabels(ctx, c.Metadata.Owner, c.Metadata.Name)
 	if err != nil {
 		return nil, err
 	}
 
 	changeSet := make(change.ChangeSet, 0)
-	changeSet = append(changeSet, rc.Spec.Repo.GetRepoChange(repo))
-	for _, labelChange := range rc.Spec.Labels.GetLabelsChangeSet(labels) {
+	changeSet = append(changeSet, c.Spec.Repo.GetRepoChange(repo))
+	for _, labelChange := range c.Spec.Labels.GetLabelsChangeSet(labels) {
 		changeSet = append(changeSet, labelChange)
 	}
 	return changeSet, nil
 }
 
-func (rc *Config) Plan(ctx context.Context) error {
-	cs, err := rc.calculateChangeSet(ctx)
+// Plan shows the expected changes without changing actual states.
+func (c *Config) Plan(ctx context.Context) error {
+	cs, err := c.calculateChangeSet(ctx)
 	if err != nil {
 		return err
 	}
 
-	for _, c := range cs {
-		fmt.Println(c)
+	for _, ch := range cs {
+		fmt.Println(ch)
 	}
 	return nil
 }
 
-func (rc *Config) Apply(ctx context.Context) error {
-	cs, err := rc.calculateChangeSet(ctx)
+// Apply changes the remote configurations based on this Config.
+func (c *Config) Apply(ctx context.Context) error {
+	cs, err := c.calculateChangeSet(ctx)
 	if err != nil {
 		return err
 	}
 
-	for _, c := range cs {
-		if err := c.Apply(ctx, rc.Metadata.Owner, rc.Metadata.Name); err != nil {
+	for _, ch := range cs {
+		if err := ch.Apply(ctx, c.Metadata.Owner, c.Metadata.Name); err != nil {
 			return err
 		}
 	}
