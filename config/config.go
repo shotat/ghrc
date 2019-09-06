@@ -13,11 +13,13 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
+// Config represents a desired remote configuration.
 type Config struct {
 	Metadata *metadata.Metadata `yaml:"metadata"`
 	Spec     *spec.Spec         `yaml:"spec"`
 }
 
+// ToYAML serialize Config to the YAML format.
 func (c *Config) ToYAML() (string, error) {
 	buf := bytes.NewBuffer(nil)
 	err := yaml.NewEncoder(buf).Encode(c)
@@ -27,6 +29,8 @@ func (c *Config) ToYAML() (string, error) {
 	return buf.String(), nil
 }
 
+// LoadFromFile loads a config file from `path`
+// the format must be YAML.
 func LoadFromFile(path string) (*Config, error) {
 	buf, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -39,14 +43,10 @@ func LoadFromFile(path string) (*Config, error) {
 	return conf, nil
 }
 
+// Import remote state to config
 func Import(ctx context.Context, owner string, name string) (*Config, error) {
 	conf := new(Config)
-	meta := &metadata.Metadata{
-		Owner: owner,
-		Name:  name,
-	}
-
-	conf.Metadata = meta
+	conf.Metadata = metadata.NewMetadata(owner, name)
 
 	repo, err := state.FindRepo(ctx, owner, name)
 	if err != nil {
