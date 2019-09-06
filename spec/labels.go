@@ -24,6 +24,7 @@ func (sp Labels) GetLabelsChangeSet(st []status.Label) []*change.LabelChange {
 				if stl.Name == spl.Name {
 					// update existing label
 					after := status.Label{
+
 						Name:        spl.Name,
 						Color:       spl.Color,
 						Description: stl.Description,

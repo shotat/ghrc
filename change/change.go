@@ -13,7 +13,7 @@ type Action rune
 
 type Change interface {
 	String() string
-	Apply(ctx context.Context) error
+	Apply(ctx context.Context, repoOwner string, repoName string) error
 }
 
 type ChangeSet []Change
@@ -31,8 +31,8 @@ type ReposChange struct {
 	After  *status.Repo
 }
 
-func (c *ReposChange) Apply(ctx context.Context) error {
-	return c.After.Update(ctx)
+func (c *ReposChange) Apply(ctx context.Context, repoOwner string, repoName string) error {
+	return c.After.Update(ctx, repoOwner, repoName)
 }
 
 func (c *ReposChange) String() string {
@@ -74,22 +74,22 @@ func (c *LabelChange) String() string {
 	return buf.String()
 }
 
-func (c *LabelChange) Apply(ctx context.Context) error {
+func (c *LabelChange) Apply(ctx context.Context, repoOwner string, repoName string) error {
 	if c.Before == nil && c.After == nil {
 		return errors.New("unexpected error")
 	}
 	if c.Before == nil && c.After != nil {
-		if err := c.After.Create(ctx); err != nil {
+		if err := c.After.Create(ctx, repoOwner, repoName); err != nil {
 			return err
 		}
 	}
 	if c.Before != nil && c.After == nil {
-		if err := c.Before.Destroy(ctx); err != nil {
+		if err := c.Before.Destroy(ctx, repoOwner, repoName); err != nil {
 			return err
 		}
 	}
 	if c.Before != nil && c.After != nil {
-		if err := c.After.Update(ctx); err != nil {
+		if err := c.After.Update(ctx, repoOwner, repoName); err != nil {
 			return err
 		}
 	}

@@ -121,7 +121,7 @@ func (rc *RepositoryConfig) Apply(ctx context.Context) error {
 	}
 
 	for _, c := range cs {
-		if err := c.Apply(ctx); err != nil {
+		if err := c.Apply(ctx, rc.Metadata.Owner, rc.Metadata.Name); err != nil {
 			return err
 		}
 	}

@@ -18,6 +18,9 @@ type Repo struct {
 
 func (sp *Repo) GetRepoChange(st *status.Repo) *change.ReposChange {
 	after := &status.Repo{
+		ID:               st.ID,
+		Name:             st.Name,
+		Owner:            st.Owner,
 		Description:      st.Description,
 		Homepage:         st.Homepage,
 		Private:          st.Private,

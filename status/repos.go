@@ -44,7 +44,7 @@ func (s *Repo) Diff(t *Repo) string {
 	return cmp.Diff(s, t)
 }
 
-func (s *Repo) Update(ctx context.Context) error {
+func (s *Repo) Update(ctx context.Context, repoOwner string, repoName string) error {
 	repo := new(github.Repository)
 	repo.Name = &s.Name
 	repo.Description = s.Description
@@ -54,7 +54,7 @@ func (s *Repo) Update(ctx context.Context) error {
 	repo.AllowSquashMerge = s.AllowSquashMerge
 	repo.AllowMergeCommit = s.AllowMergeCommit
 
-	if _, _, err := ghc.Repositories.Edit(ctx, s.Owner, s.Name, repo); err != nil {
+	if _, _, err := ghc.Repositories.Edit(ctx, repoOwner, repoName, repo); err != nil {
 		return err
 	}
 
