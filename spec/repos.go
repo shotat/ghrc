@@ -16,6 +16,18 @@ type Repo struct {
 	Topics []string `yaml:"topics,omitempty"`
 }
 
+func LoadRepoSpecFromState(st *state.Repo) *Repo {
+	return &Repo{
+		Homepage:         st.Homepage,
+		Description:      st.Description,
+		Private:          st.Private,
+		Topics:           st.Topics,
+		AllowSquashMerge: st.AllowSquashMerge,
+		AllowMergeCommit: st.AllowMergeCommit,
+		AllowRebaseMerge: st.AllowRebaseMerge,
+	}
+}
+
 func (sp *Repo) GetRepoChange(st *state.Repo) *change.ReposChange {
 	after := &state.Repo{
 		ID:               st.ID,

@@ -47,39 +47,23 @@ func LoadFromFile(path string) (*Config, error) {
 func Import(ctx context.Context, owner string, name string) (*Config, error) {
 	conf := new(Config)
 	conf.Metadata = metadata.NewMetadata(owner, name)
+	conf.Spec = new(spec.Spec)
 
 	repo, err := state.FindRepo(ctx, owner, name)
 	if err != nil {
 		return nil, err
 	}
-	sp := new(spec.Spec)
-	sp.Repo.Homepage = repo.Homepage
-	sp.Repo.Description = repo.Description
-	sp.Repo.Private = repo.Private
-	sp.Repo.Topics = repo.Topics
-	sp.Repo.AllowSquashMerge = repo.AllowSquashMerge
-	sp.Repo.AllowMergeCommit = repo.AllowMergeCommit
-	sp.Repo.AllowRebaseMerge = repo.AllowRebaseMerge
 
 	labels, err := state.FindLabels(ctx, owner, name)
 	if err != nil {
 		return nil, err
 	}
-	if labels != nil {
-		sp.Labels = make([]spec.Label, len(labels))
-		for i, label := range labels {
-			sp.Labels[i] = spec.Label{
-				Name:        label.Name,
-				Description: label.Description,
-				Color:       label.Color,
-			}
-		}
-	}
+
+	conf.Spec.Repo = spec.LoadRepoSpecFromState(repo)
+	conf.Spec.Labels = spec.LoadLabelsSpecFromSpec(labels)
 
 	// TODO
 	// spec.Protections = repo.Protections
-
-	conf.Spec = sp
 
 	return conf, nil
 }

@@ -13,6 +13,18 @@ type Label struct {
 
 type Labels []Label
 
+func LoadLabelsSpecFromSpec(states []state.Label) Labels {
+	specs := make([]Label, len(states))
+	for i, label := range states {
+		specs[i] = Label{
+			Name:        label.Name,
+			Description: label.Description,
+			Color:       label.Color,
+		}
+	}
+	return specs
+}
+
 func (sp Labels) GetLabelsChangeSet(st []state.Label) []*change.LabelChange {
 	if sp == nil {
 		return nil
