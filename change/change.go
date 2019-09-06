@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/shotat/ghrc/config"
 	"github.com/shotat/ghrc/state"
 )
 
@@ -24,6 +25,52 @@ const (
 	Update Action = '~'
 	Delete Action = '-'
 )
+
+func CalculateChangeSet(ctx context.Context, c *config.Config) (ChangeSet, error) {
+	repo, err := state.FindRepo(ctx, c.Metadata.Owner, c.Metadata.Name)
+	if err != nil {
+		return nil, err
+	}
+	labels, err := state.FindLabels(ctx, c.Metadata.Owner, c.Metadata.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	changeSet := make(ChangeSet, 0)
+	changeSet = append(changeSet, GetRepoChange(repo, c.Spec.Repo))
+	for _, labelChange := range GetLabelsChangeSet(labels, c.Spec.Labels) {
+		changeSet = append(changeSet, labelChange)
+	}
+	return changeSet, nil
+}
+
+// Plan shows the expected changes without changing actual states.
+func Plan(ctx context.Context, c *config.Config) error {
+	cs, err := CalculateChangeSet(ctx, c)
+	if err != nil {
+		return err
+	}
+
+	for _, ch := range cs {
+		fmt.Println(ch)
+	}
+	return nil
+}
+
+// Apply changes the remote configurations based on this Config.
+func Apply(ctx context.Context, c *config.Config) error {
+	cs, err := CalculateChangeSet(ctx, c)
+	if err != nil {
+		return err
+	}
+
+	for _, ch := range cs {
+		if err := ch.Apply(ctx, c.Metadata.Owner, c.Metadata.Name); err != nil {
+			return err
+		}
+	}
+	return nil
+}
 
 type ReposChange struct {
 	Action Action
