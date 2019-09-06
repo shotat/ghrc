@@ -12,6 +12,11 @@ var planCmd = &cobra.Command{
 	Use:   "plan",
 	Short: "Check expected changes without changing the actual state",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		filepath, err := cmd.Flags().GetString("config")
+		if err != nil {
+			return err
+		}
+
 		conf, err := config.LoadFromFile(filepath)
 		if err != nil {
 			return err
