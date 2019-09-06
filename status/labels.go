@@ -39,7 +39,7 @@ func (l *Label) Destroy(ctx context.Context) error {
 	return err
 }
 
-func findLabels(ctx context.Context, owner string, repo string) ([]Label, error) {
+func FindLabels(ctx context.Context, owner string, repo string) ([]Label, error) {
 	ghLabels, _, err := ghc.Issues.ListLabels(ctx, owner, repo, nil)
 	if err != nil {
 		return nil, err

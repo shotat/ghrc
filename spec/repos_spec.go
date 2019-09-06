@@ -1,36 +1,11 @@
 package spec
 
 import (
-	"github.com/shotat/ghrc/patch"
+	"github.com/shotat/ghrc/change"
 	"github.com/shotat/ghrc/status"
 )
 
-/*
-
-type EntirePatch struct  {
-	RepositoryPatch RepositoryPatch
-	labelPatches []LabelPatch
-	branchPatches []BranchPatch
-
-	patch.String()
-	CHANGE "foo" => "bar"
-	DELETE "ready_for_review" =
-	CHANGE "foo" => "bar"
-	type Delelte struct {
-		Resource
-	}
-	type Create struct {
-		Resource
-	}
-	type Change struct {
-		Old Resource
-		New Resource
-	}
-}
-
-*/
-
-type RepositorySpec struct {
+type Repo struct {
 	Description      *string `yaml:"description,omitempty"`
 	Homepage         *string `yaml:"homepage,omitempty"`
 	Private          *bool   `yaml:"private"`
@@ -38,100 +13,105 @@ type RepositorySpec struct {
 	AllowMergeCommit *bool   `yaml:"allowMergeCommit"`
 	AllowRebaseMerge *bool   `yaml:"allowRebaseMerge"`
 
-	Topics      []string     `yaml:"topics,omitempty"`
+	Topics []string `yaml:"topics,omitempty"`
+}
+
+type Spec struct {
+	Repo        *Repo        `yaml:"repo,omitempty"`
 	Labels      []Label      `yaml:"labels,omitempty"`
 	Protections []Protection `yaml:"protections,omitempty"`
 }
 
-type RepositoryPatch struct {
-	Description      *string
-	Homepage         *string
-	Private          *bool
-	AllowSquashMerge *bool
-	AllowMergeCommit *bool
-	AllowRebaseMerge *bool
-	// ProtectionsPatch *status.BulkPatch
-	LabelPatches []patch.LabelPatch
-}
-
-func (sp *RepositorySpec) CalculatePatch(st *status.RepositoryStatus) *RepositoryPatch {
-	p := new(RepositoryPatch)
-	if sp.Description != nil && st.Description != sp.Description {
-		p.Description = sp.Description
+func GetLabelsChangeSet(st []status.Label, sp []Label) []change.LabelChange {
+	if sp == nil {
+		return nil
 	}
-	if sp.Private != nil && st.Private != sp.Private {
-		p.Private = sp.Private
-	}
-	if sp.Homepage != nil && st.Homepage != sp.Homepage {
-		p.Homepage = sp.Homepage
-	}
-	if sp.AllowSquashMerge != nil && st.AllowSquashMerge != sp.AllowSquashMerge {
-		p.AllowSquashMerge = sp.AllowSquashMerge
-	}
-	/*
-		if sp.AllowMergeCommit != nil {
-			st.AllowMergeCommit != sp.AllowMergeCommit
-		}
-		if sp.AllowRebaseMerge != nil {
-			st.AllowRebaseMerge != sp.AllowRebaseMerge
-		}
-		if sp.Topics != nil {
-			st.Topics = sp.Topics
-		}
-	*/
-	if sp.Labels != nil {
-		labelPatches := make([]patch.LabelPatch, 0)
-		for _, spl := range sp.Labels {
-			func() {
-				for _, stl := range st.Labels {
-					if stl.Name == spl.Name {
-						// update existing label
-						after := status.Label{
-							Name:        spl.Name,
-							Color:       spl.Color,
-							Description: stl.Description,
-						}
-						if spl.Description != nil {
-							after.Description = spl.Description
-						}
-						labelPatches = append(labelPatches, patch.LabelPatch{
-							Before: &stl,
-							After:  &after,
-						})
-						return
-					}
-				}
-				// new label
-				labelPatches = append(labelPatches, patch.LabelPatch{
-					Before: nil,
-					After: &status.Label{
+	changes := make([]change.LabelChange, 0)
+	for _, spl := range sp {
+		func() {
+			for _, stl := range st {
+				if stl.Name == spl.Name {
+					// update existing label
+					after := status.Label{
 						Name:        spl.Name,
 						Color:       spl.Color,
-						Description: spl.Description,
-					},
-				})
-				return
-			}()
-		}
-		for _, stl := range st.Labels {
-			func() {
-				for _, spl := range sp.Labels {
-					if stl.Name == spl.Name {
-						return
+						Description: stl.Description,
 					}
+					if spl.Description != nil {
+						after.Description = spl.Description
+					}
+					changes = append(changes, change.LabelChange{
+						Action: change.Update,
+						Before: &stl,
+						After:  &after,
+					})
+					return
 				}
+			}
+			// new label
+			changes = append(changes, change.LabelChange{
+				Action: change.Create,
+				Before: nil,
+				After: &status.Label{
+					Name:        spl.Name,
+					Color:       spl.Color,
+					Description: spl.Description,
+				},
+			})
+			return
+		}()
+	}
+	for _, stl := range st {
+		func() {
+			for _, spl := range sp {
+				if stl.Name == spl.Name {
+					return
+				}
+			}
 
-				// deletion
-				labelPatches = append(labelPatches, patch.LabelPatch{
-					Before: &stl,
-					After:  nil,
-				})
-				return
-			}()
-		}
-		p.LabelPatches = labelPatches
+			// deletion
+			changes = append(changes, change.LabelChange{
+				Action: change.Delete,
+				Before: &stl,
+				After:  nil,
+			})
+			return
+		}()
+	}
+	return changes
+}
+func (sp *Repo) GetRepoChange(st *status.Repo) *change.ReposChange {
+	after := &status.Repo{
+		Description:      st.Description,
+		Homepage:         st.Homepage,
+		Private:          st.Private,
+		AllowSquashMerge: st.AllowSquashMerge,
+		AllowMergeCommit: st.AllowMergeCommit,
+		AllowRebaseMerge: st.AllowRebaseMerge,
+		Topics:           st.Topics,
 	}
 
+	if sp.Description != nil {
+		after.Description = sp.Description
+	}
+	if sp.Private != nil {
+		after.Private = sp.Private
+	}
+	if sp.Homepage != nil {
+		after.Homepage = sp.Homepage
+	}
+	if sp.AllowSquashMerge != nil {
+		after.AllowSquashMerge = sp.AllowSquashMerge
+	}
+	if sp.AllowMergeCommit != nil {
+		after.AllowMergeCommit = sp.AllowMergeCommit
+	}
+	if sp.AllowRebaseMerge != nil {
+		after.AllowRebaseMerge = sp.AllowRebaseMerge
+	}
+	if sp.Topics != nil {
+		after.Topics = sp.Topics
+	}
 	/*
 		if sp.Protections != nil {
 			protectionsPatch := new(status.BulkPatch)
@@ -159,7 +139,11 @@ func (sp *RepositorySpec) CalculatePatch(st *status.RepositoryStatus) *Repositor
 			st.Protections = protections
 		}
 	*/
-	return p
+	return &change.ReposChange{
+		Action: change.Update,
+		Before: st,
+		After:  after,
+	}
 }
 
 type Label struct {

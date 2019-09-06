@@ -16,16 +16,10 @@ const (
 	Delete Action = '-'
 )
 
-type StringChange struct {
-	Action Action
-	Before *string
-	After  *string
-}
-
 type ReposChange struct {
-	DescriptionChange StringChange
-	PrivateChange     StringChange
-	LabelChanges      []LabelChange
+	Action Action
+	Before *status.Repo
+	After  *status.Repo
 }
 
 type LabelChange struct {
@@ -34,22 +28,22 @@ type LabelChange struct {
 	After  *status.Label
 }
 
-func (p *LabelPatch) Apply(ctx context.Context) error {
-	if p.Before == nil && p.After == nil {
+func (c *LabelChange) Apply(ctx context.Context) error {
+	if c.Before == nil && c.After == nil {
 		return errors.New("unexpected error")
 	}
-	if p.Before == nil && p.After != nil {
-		if err := p.After.Create(ctx); err != nil {
+	if c.Before == nil && c.After != nil {
+		if err := c.After.Create(ctx); err != nil {
 			return err
 		}
 	}
-	if p.Before != nil && p.After == nil {
-		if err := p.Before.Destroy(ctx); err != nil {
+	if c.Before != nil && c.After == nil {
+		if err := c.Before.Destroy(ctx); err != nil {
 			return err
 		}
 	}
-	if p.Before != nil && p.After != nil {
-		if err := p.After.Change(ctx); err != nil {
+	if c.Before != nil && c.After != nil {
+		if err := c.After.Change(ctx); err != nil {
 			return err
 		}
 	}
