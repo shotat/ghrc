@@ -2,7 +2,7 @@ package spec
 
 import (
 	"github.com/shotat/ghrc/change"
-	"github.com/shotat/ghrc/status"
+	"github.com/shotat/ghrc/state"
 )
 
 type Protection struct {
@@ -32,13 +32,13 @@ type RequiredStatusCheck struct {
 	Contexts []string `yaml:"contexts"`
 }
 
-func (sp *Repo) GetProtectionsChange(st []status.Protection) *change.ReposChange {
+func (sp *Repo) GetProtectionsChange(st []state.Protection) *change.ReposChange {
 	/*
 		if sp.Protections != nil {
-			protectionsPatch := new(status.BulkPatch)
-			protections := make([]status.Protection, len(sp.Protections))
+			protectionsPatch := new(state.BulkPatch)
+			protections := make([]state.Protection, len(sp.Protections))
 			for i, spp := range sp.Protections {
-				protections[i] = func() status.Protection {
+				protections[i] = func() state.Protection {
 					for _, stp := range st.Protections {
 						if stp.Branch == spp.Branch {
 							if spp.EnforceAdmins != nil {
@@ -49,7 +49,7 @@ func (sp *Repo) GetProtectionsChange(st []status.Protection) *change.ReposChange
 					}
 
 					// new protection
-					return status.Protection{
+					return state.Protection{
 						Branch:        spp.Branch,
 						EnforceAdmins: spp.EnforceAdmins,
 						// RequiredStatusCheck:        spp.RequiredStatusCheck,

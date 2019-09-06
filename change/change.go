@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/shotat/ghrc/status"
+	"github.com/shotat/ghrc/state"
 )
 
 type Action rune
@@ -27,8 +27,8 @@ const (
 
 type ReposChange struct {
 	Action Action
-	Before *status.Repo
-	After  *status.Repo
+	Before *state.Repo
+	After  *state.Repo
 }
 
 func (c *ReposChange) Apply(ctx context.Context, repoOwner string, repoName string) error {
@@ -53,8 +53,8 @@ func (c *ReposChange) String() string {
 
 type LabelChange struct {
 	Action Action
-	Before *status.Label
-	After  *status.Label
+	Before *state.Label
+	After  *state.Label
 }
 
 func (c *LabelChange) String() string {

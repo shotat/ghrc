@@ -2,7 +2,7 @@ package spec
 
 import (
 	"github.com/shotat/ghrc/change"
-	"github.com/shotat/ghrc/status"
+	"github.com/shotat/ghrc/state"
 )
 
 type Repo struct {
@@ -16,8 +16,8 @@ type Repo struct {
 	Topics []string `yaml:"topics,omitempty"`
 }
 
-func (sp *Repo) GetRepoChange(st *status.Repo) *change.ReposChange {
-	after := &status.Repo{
+func (sp *Repo) GetRepoChange(st *state.Repo) *change.ReposChange {
+	after := &state.Repo{
 		ID:               st.ID,
 		Name:             st.Name,
 		Owner:            st.Owner,

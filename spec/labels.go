@@ -2,7 +2,7 @@ package spec
 
 import (
 	"github.com/shotat/ghrc/change"
-	"github.com/shotat/ghrc/status"
+	"github.com/shotat/ghrc/state"
 )
 
 type Label struct {
@@ -13,7 +13,7 @@ type Label struct {
 
 type Labels []Label
 
-func (sp Labels) GetLabelsChangeSet(st []status.Label) []*change.LabelChange {
+func (sp Labels) GetLabelsChangeSet(st []state.Label) []*change.LabelChange {
 	if sp == nil {
 		return nil
 	}
@@ -23,7 +23,7 @@ func (sp Labels) GetLabelsChangeSet(st []status.Label) []*change.LabelChange {
 			for _, stl := range st {
 				if stl.Name == spl.Name {
 					// update existing label
-					after := status.Label{
+					after := state.Label{
 
 						Name:        spl.Name,
 						Color:       spl.Color,
@@ -44,7 +44,7 @@ func (sp Labels) GetLabelsChangeSet(st []status.Label) []*change.LabelChange {
 			changes = append(changes, &change.LabelChange{
 				Action: change.Create,
 				Before: nil,
-				After: &status.Label{
+				After: &state.Label{
 					Name:        spl.Name,
 					Color:       spl.Color,
 					Description: spl.Description,
@@ -54,7 +54,7 @@ func (sp Labels) GetLabelsChangeSet(st []status.Label) []*change.LabelChange {
 		}(spl)
 	}
 	for _, stl := range st {
-		func(stl status.Label) {
+		func(stl state.Label) {
 			for _, spl := range sp {
 				if stl.Name == spl.Name {
 					return

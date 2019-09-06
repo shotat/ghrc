@@ -9,13 +9,13 @@ import (
 	"github.com/shotat/ghrc/change"
 	"github.com/shotat/ghrc/metadata"
 	"github.com/shotat/ghrc/spec"
-	"github.com/shotat/ghrc/status"
+	"github.com/shotat/ghrc/state"
 	yaml "gopkg.in/yaml.v2"
 )
 
 type RepositoryConfig struct {
-	Metadata *metadata.RepositoryMetadata `yaml:"metadata"`
-	Spec     *spec.Spec                   `yaml:"spec"`
+	Metadata *metadata.Metadata `yaml:"metadata"`
+	Spec     *spec.Spec         `yaml:"spec"`
 }
 
 func (c *RepositoryConfig) ToYAML() (string, error) {
@@ -41,14 +41,14 @@ func LoadFromFile(path string) (*RepositoryConfig, error) {
 
 func Import(ctx context.Context, owner string, name string) (*RepositoryConfig, error) {
 	conf := new(RepositoryConfig)
-	meta := &metadata.RepositoryMetadata{
+	meta := &metadata.Metadata{
 		Owner: owner,
 		Name:  name,
 	}
 
 	conf.Metadata = meta
 
-	repo, err := status.FindRepo(owner, name)
+	repo, err := state.FindRepo(owner, name)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +61,7 @@ func Import(ctx context.Context, owner string, name string) (*RepositoryConfig, 
 	sp.Repo.AllowMergeCommit = repo.AllowMergeCommit
 	sp.Repo.AllowRebaseMerge = repo.AllowRebaseMerge
 
-	labels, err := status.FindLabels(ctx, owner, name)
+	labels, err := state.FindLabels(ctx, owner, name)
 	if err != nil {
 		return nil, err
 	}
@@ -85,11 +85,11 @@ func Import(ctx context.Context, owner string, name string) (*RepositoryConfig, 
 }
 
 func (rc *RepositoryConfig) calculateChangeSet(ctx context.Context) (change.ChangeSet, error) {
-	repo, err := status.FindRepo(rc.Metadata.Owner, rc.Metadata.Name)
+	repo, err := state.FindRepo(rc.Metadata.Owner, rc.Metadata.Name)
 	if err != nil {
 		return nil, err
 	}
-	labels, err := status.FindLabels(ctx, rc.Metadata.Owner, rc.Metadata.Name)
+	labels, err := state.FindLabels(ctx, rc.Metadata.Owner, rc.Metadata.Name)
 	if err != nil {
 		return nil, err
 	}
