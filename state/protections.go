@@ -30,6 +30,22 @@ type RequiredStatusCheck struct {
 	Contexts []string
 }
 
+func (p *Protection) Update(ctx context.Context, repoOwner string, repoName string) error {
+	req := &github.ProtectionRequest{
+		RequiredStatusChecks:       nil,
+		RequiredPullRequestReviews: nil,
+		EnforceAdmins:              *p.EnforceAdmins,
+		Restrictions:               nil,
+	}
+	_, _, err := ghc.Repositories.UpdateBranchProtection(ctx, repoOwner, repoName, *p.Branch, req)
+	return err
+}
+
+func (p *Protection) Destroy(ctx context.Context, repoOwner string, repoName string) error {
+	_, err := ghc.Repositories.RemoveBranchProtection(ctx, repoOwner, repoName, *p.Branch)
+	return err
+}
+
 func FindProtections(ctx context.Context, owner string, repo string) ([]Protection, error) {
 	protected := true
 	opt := &github.BranchListOptions{
