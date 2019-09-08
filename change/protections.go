@@ -2,6 +2,7 @@ package change
 
 import (
 	"context"
+	"errors"
 
 	"github.com/shotat/ghrc/spec"
 	"github.com/shotat/ghrc/state"
@@ -18,7 +19,14 @@ func (c *ProtectionChange) String() string {
 }
 
 func (c *ProtectionChange) Apply(ctx context.Context, repoOwner string, repoName string) error {
-	return nil
+	err := errors.New("unexpected error")
+	switch c.Action {
+	case Create, Update:
+		err = c.After.Update(ctx, repoOwner, repoName)
+	case Delete:
+		err = c.Before.Destroy(ctx, repoOwner, repoName)
+	}
+	return err
 }
 
 func GetProtectionChangeSet(st []state.Protection, sp spec.Protections) []*ProtectionChange {
