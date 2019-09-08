@@ -1,5 +1,7 @@
 # GHRC
 
+*NOTE: work in progress*
+
 GHRC is a tool for managing **G**it**H**ub **R**epository **C**onfigurations in a declarative way.
 
 Repository configuration includes
@@ -12,6 +14,12 @@ Repository configuration includes
 - Topics
 - Description
 
+## Installation
+
+```sh
+$ go get github.com/shotat/ghrc
+```
+
 ## Environment Variables
 
 - `GHRC_GITHUB_TOKEN`
@@ -23,7 +31,7 @@ Repository configuration includes
 
 ```sh
 # ghrc import --owner <repository owner name> --name <repository name>
-$ ghrc import --owner shotat --name ghrc
+$ ghrc import --owner shotat --name ghrc > .ghrc.yaml
 ```
 
 ### Check expected changes without changing the actual state.
