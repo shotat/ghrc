@@ -40,13 +40,11 @@ func GetProtectionChangeSet(st []state.Protection, sp spec.Protections) []*Prote
 			for _, stp := range st {
 				if stp.Branch == spp.Branch {
 					// update
-					after := state.Protection{
-						// TODO
-					}
+					after := spp.ToState(&stp)
 					changes = append(changes, &ProtectionChange{
 						Action: Update,
 						Before: &stp,
-						After:  &after,
+						After:  after,
 					})
 					return
 				}
@@ -56,9 +54,7 @@ func GetProtectionChangeSet(st []state.Protection, sp spec.Protections) []*Prote
 			changes = append(changes, &ProtectionChange{
 				Action: Create,
 				Before: nil,
-				After:  &state.Protection{
-					// TODO
-				},
+				After:  spp.ToState(nil),
 			})
 		}(spp)
 	}
