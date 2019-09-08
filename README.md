@@ -23,7 +23,11 @@ $ go get github.com/shotat/ghrc
 ## Environment Variables
 
 - `GHRC_GITHUB_TOKEN`
-- `GHRC_GITHUB_API` (default: "https://api.github.com")
+  - Your GitHub API Token
+- `GHRC_GITHUB_API`
+  - GitHub API BaseURL
+    - Default: `https://api.github.com/`
+    - Enterprise: `https://<domain>/api/v3/`
 
 ## Usage
 
