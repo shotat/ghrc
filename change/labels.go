@@ -34,40 +34,29 @@ func (c *LabelChange) String() string {
 }
 
 func (c *LabelChange) Apply(ctx context.Context, repoOwner string, repoName string) error {
-	if c.Before == nil && c.After == nil {
-		return errors.New("unexpected error")
+	err := errors.New("unexpected error")
+	switch c.Action {
+	case Create:
+		err = c.After.Create(ctx, repoOwner, repoName)
+	case Delete:
+		err = c.Before.Destroy(ctx, repoOwner, repoName)
+	case Update:
+		err = c.After.Update(ctx, repoOwner, repoName)
 	}
-	if c.Before == nil && c.After != nil {
-		if err := c.After.Create(ctx, repoOwner, repoName); err != nil {
-			return err
-		}
-	}
-	if c.Before != nil && c.After == nil {
-		if err := c.Before.Destroy(ctx, repoOwner, repoName); err != nil {
-			return err
-		}
-	}
-	if c.Before != nil && c.After != nil {
-		if err := c.After.Update(ctx, repoOwner, repoName); err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return err
 }
 
 func GetLabelChangeSet(st []state.Label, sp spec.Labels) []*LabelChange {
-	if sp == nil {
-		return nil
-	}
 	changes := make([]*LabelChange, 0)
+	if sp == nil {
+		return changes
+	}
 	for _, spl := range sp {
 		func(spl spec.Label) {
 			for _, stl := range st {
 				if stl.Name == spl.Name {
 					// update existing label
 					after := state.Label{
-
 						Name:        spl.Name,
 						Color:       spl.Color,
 						Description: stl.Description,

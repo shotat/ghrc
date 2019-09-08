@@ -2,6 +2,7 @@ package change
 
 import (
 	"context"
+	"errors"
 
 	"github.com/shotat/ghrc/spec"
 	"github.com/shotat/ghrc/state"
@@ -18,36 +19,65 @@ func (c *ProtectionChange) String() string {
 }
 
 func (c *ProtectionChange) Apply(ctx context.Context, repoOwner string, repoName string) error {
-	return nil
+	err := errors.New("unexpected error")
+	switch c.Action {
+	case Create, Update:
+		err = c.After.Update(ctx, repoOwner, repoName)
+	case Delete:
+		err = c.Before.Destroy(ctx, repoOwner, repoName)
+	}
+	return err
 }
 
 func GetProtectionChangeSet(st []state.Protection, sp spec.Protections) []*ProtectionChange {
-	/*
-		if sp.Protections != nil {
-			protectionsPatch := new(state.BulkPatch)
-			protections := make([]state.Protection, len(sp.Protections))
-			for i, spp := range sp.Protections {
-				protections[i] = func() state.Protection {
-					for _, stp := range st.Protections {
-						if stp.Branch == spp.Branch {
-							if spp.EnforceAdmins != nil {
-								stp.EnforceAdmins = spp.EnforceAdmins
-								return stp
-							}
-						}
-					}
+	changes := make([]*ProtectionChange, 0)
+	if sp == nil {
+		return changes
+	}
 
-					// new protection
-					return state.Protection{
-						Branch:        spp.Branch,
-						EnforceAdmins: spp.EnforceAdmins,
-						// RequiredStatusCheck:        spp.RequiredStatusCheck,
-						// RequiredPullRequestReviews: *spp.RequiredPullRequestReviews,
+	for _, spp := range sp {
+		func(spp spec.Protection) {
+			for _, stp := range st {
+				if stp.Branch == spp.Branch {
+					// update
+					after := state.Protection{
+						// TODO
 					}
-				}()
+					changes = append(changes, &ProtectionChange{
+						Action: Update,
+						Before: &stp,
+						After:  &after,
+					})
+					return
+				}
 			}
-			st.Protections = protections
-		}
-	*/
-	return nil
+
+			// new protection
+			changes = append(changes, &ProtectionChange{
+				Action: Create,
+				Before: nil,
+				After:  &state.Protection{
+					// TODO
+				},
+			})
+		}(spp)
+	}
+
+	for _, stp := range st {
+		func(stp state.Protection) {
+			for _, spp := range sp {
+				if stp.Branch == spp.Branch {
+					return
+				}
+			}
+
+			// deletion
+			changes = append(changes, &ProtectionChange{
+				Action: Delete,
+				Before: &stp,
+				After:  nil,
+			})
+		}(stp)
+	}
+	return changes
 }
