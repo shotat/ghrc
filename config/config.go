@@ -77,11 +77,18 @@ func (c *Config) CalculateChangeSet(ctx context.Context) (change.ChangeSet, erro
 	if err != nil {
 		return nil, err
 	}
+	protections, err := state.FindProtections(ctx, c.Metadata.Owner, c.Metadata.Name)
+	if err != nil {
+		return nil, err
+	}
 
 	changeSet := make(change.ChangeSet, 0)
 	changeSet = append(changeSet, change.GetRepoChange(repo, c.Spec.Repo))
-	for _, labelChange := range change.GetLabelsChangeSet(labels, c.Spec.Labels) {
+	for _, labelChange := range change.GetLabelChangeSet(labels, c.Spec.Labels) {
 		changeSet = append(changeSet, labelChange)
+	}
+	for _, protectionChange := range change.GetProtectionChangeSet(protections, c.Spec.Protections) {
+		changeSet = append(changeSet, protectionChange)
 	}
 	return changeSet, nil
 }

@@ -1,11 +1,27 @@
 package change
 
 import (
+	"context"
+
 	"github.com/shotat/ghrc/spec"
 	"github.com/shotat/ghrc/state"
 )
 
-func GetProtectionsChange(st []state.Protection, sp *spec.Repo) *RepoChange {
+type ProtectionChange struct {
+	Action Action
+	Before *state.Protection
+	After  *state.Protection
+}
+
+func (c *ProtectionChange) String() string {
+	return "TODO"
+}
+
+func (c *ProtectionChange) Apply(ctx context.Context, repoOwner string, repoName string) error {
+	return nil
+}
+
+func GetProtectionChangeSet(st []state.Protection, sp spec.Protections) []*ProtectionChange {
 	/*
 		if sp.Protections != nil {
 			protectionsPatch := new(state.BulkPatch)

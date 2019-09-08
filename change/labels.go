@@ -56,7 +56,7 @@ func (c *LabelChange) Apply(ctx context.Context, repoOwner string, repoName stri
 	return nil
 }
 
-func GetLabelsChangeSet(st []state.Label, sp spec.Labels) []*LabelChange {
+func GetLabelChangeSet(st []state.Label, sp spec.Labels) []*LabelChange {
 	if sp == nil {
 		return nil
 	}
