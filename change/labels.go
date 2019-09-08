@@ -56,18 +56,11 @@ func GetLabelChangeSet(st []state.Label, sp spec.Labels) []*LabelChange {
 			for _, stl := range st {
 				if stl.Name == spl.Name {
 					// update existing label
-					after := state.Label{
-						Name:        spl.Name,
-						Color:       spl.Color,
-						Description: stl.Description,
-					}
-					if spl.Description != nil {
-						after.Description = spl.Description
-					}
+					after := spl.ToState(&stl)
 					changes = append(changes, &LabelChange{
 						Action: Update,
 						Before: &stl,
-						After:  &after,
+						After:  after,
 					})
 					return
 				}
@@ -76,11 +69,7 @@ func GetLabelChangeSet(st []state.Label, sp spec.Labels) []*LabelChange {
 			changes = append(changes, &LabelChange{
 				Action: Create,
 				Before: nil,
-				After: &state.Label{
-					Name:        spl.Name,
-					Color:       spl.Color,
-					Description: spl.Description,
-				},
+				After:  spl.ToState(nil),
 			})
 			return
 		}(spl)

@@ -23,3 +23,15 @@ func LoadLabelsSpecFromSpec(states []state.Label) Labels {
 	}
 	return specs
 }
+
+// ToState merge state and spec to generate new state
+func (sp *Label) ToState(base *state.Label) *state.Label {
+	newState := &state.Label{}
+	// initialize
+	if base != nil {
+		newState.Description = base.Description
+	}
+	newState.Name = sp.Name
+	newState.Color = sp.Color
+	return newState
+}
