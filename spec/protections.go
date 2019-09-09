@@ -3,11 +3,11 @@ package spec
 import "github.com/shotat/ghrc/state"
 
 type Protection struct {
-	Branch                     string                     `yaml:"branch"`
-	RequiredStatusChecks       RequiredStatusChecks       `yaml:"requiredStatusChecks"`
-	EnforceAdmins              bool                       `yaml:"enforceAdmins"`
-	RequiredPullRequestReviews RequiredPullRequestReviews `yaml:"requiredPullRequestReviews"`
-	Restrictions               Restrictions               `yaml:"restrictions"`
+	Branch                     string                      `yaml:"branch"`
+	RequiredStatusChecks       *RequiredStatusChecks       `yaml:"requiredStatusChecks"`
+	EnforceAdmins              *bool                       `yaml:"enforceAdmins"`
+	RequiredPullRequestReviews *RequiredPullRequestReviews `yaml:"requiredPullRequestReviews"`
+	Restrictions               *Restrictions               `yaml:"restrictions"`
 }
 
 type Protections []Protection
@@ -56,10 +56,10 @@ func LoadProtectionsSpecFromState(states []state.Protection) Protections {
 
 		specs[i] = Protection{
 			Branch:                     protection.Branch,
-			RequiredStatusChecks:       requiredStatusChecks,
-			EnforceAdmins:              protection.EnforceAdmins,
-			RequiredPullRequestReviews: requiredPullRequestReviews,
-			Restrictions:               restrictions,
+			RequiredStatusChecks:       &requiredStatusChecks,
+			EnforceAdmins:              &protection.EnforceAdmins,
+			RequiredPullRequestReviews: &requiredPullRequestReviews,
+			Restrictions:               &restrictions,
 		}
 	}
 	return specs
@@ -71,18 +71,26 @@ func (sp *Protection) ToState() *state.Protection {
 
 	newState.Branch = sp.Branch
 
-	newState.RequiredStatusChecks.Strict = sp.RequiredStatusChecks.Strict
-	newState.RequiredStatusChecks.Contexts = sp.RequiredStatusChecks.Contexts
+	if sp.RequiredStatusChecks != nil {
+		newState.RequiredStatusChecks.Strict = sp.RequiredStatusChecks.Strict
+		newState.RequiredStatusChecks.Contexts = sp.RequiredStatusChecks.Contexts
+	}
 
-	newState.EnforceAdmins = sp.EnforceAdmins
+	if sp.EnforceAdmins != nil {
+		newState.EnforceAdmins = *sp.EnforceAdmins
+	}
 
-	newState.RequiredPullRequestReviews.RequiredApprovingReviewCount = sp.RequiredPullRequestReviews.RequiredApprovingReviewCount
-	newState.RequiredPullRequestReviews.DismissStaleReviews = sp.RequiredPullRequestReviews.DismissStaleReviews
-	newState.RequiredPullRequestReviews.RequireCodeOwnerReviews = sp.RequiredPullRequestReviews.RequireCodeOwnerReviews
-	newState.RequiredPullRequestReviews.DismissalRestrictions.Users = sp.RequiredPullRequestReviews.DismissalRestrictions.Users
-	newState.RequiredPullRequestReviews.DismissalRestrictions.Teams = sp.RequiredPullRequestReviews.DismissalRestrictions.Teams
+	if sp.RequiredPullRequestReviews != nil {
+		newState.RequiredPullRequestReviews.RequiredApprovingReviewCount = sp.RequiredPullRequestReviews.RequiredApprovingReviewCount
+		newState.RequiredPullRequestReviews.DismissStaleReviews = sp.RequiredPullRequestReviews.DismissStaleReviews
+		newState.RequiredPullRequestReviews.RequireCodeOwnerReviews = sp.RequiredPullRequestReviews.RequireCodeOwnerReviews
+		newState.RequiredPullRequestReviews.DismissalRestrictions.Users = sp.RequiredPullRequestReviews.DismissalRestrictions.Users
+		newState.RequiredPullRequestReviews.DismissalRestrictions.Teams = sp.RequiredPullRequestReviews.DismissalRestrictions.Teams
+	}
 
-	newState.Restrictions.Users = sp.Restrictions.Users
-	newState.Restrictions.Teams = sp.Restrictions.Teams
+	if sp.Restrictions != nil {
+		newState.Restrictions.Users = sp.Restrictions.Users
+		newState.Restrictions.Teams = sp.Restrictions.Teams
+	}
 	return newState
 }

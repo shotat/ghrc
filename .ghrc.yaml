@@ -32,9 +32,9 @@ spec:
   protections:
   - branch: master
     requiredStatusChecks:
-      strict: false
+      strict: true
       contexts: []
-    enforceAdmins: true
+    enforceAdmins: false
     requiredPullRequestReviews:
       dismissalRestrictions:
         users: []
