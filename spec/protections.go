@@ -4,10 +4,10 @@ import "github.com/shotat/ghrc/state"
 
 type Protection struct {
 	Branch                     string                      `yaml:"branch"`
-	RequiredStatusChecks       *RequiredStatusChecks       `yaml:"requiredStatusChecks"`
-	EnforceAdmins              *bool                       `yaml:"enforceAdmins"`
-	RequiredPullRequestReviews *RequiredPullRequestReviews `yaml:"requiredPullRequestReviews"`
-	Restrictions               *Restrictions               `yaml:"restrictions"`
+	RequiredStatusChecks       *RequiredStatusChecks       `yaml:"requiredStatusChecks,omitempty"`
+	EnforceAdmins              *bool                       `yaml:"enforceAdmins,omitempty"`
+	RequiredPullRequestReviews *RequiredPullRequestReviews `yaml:"requiredPullRequestReviews,omitempty"`
+	Restrictions               *Restrictions               `yaml:"restrictions,omitempty"`
 }
 
 type Protections []Protection
@@ -32,34 +32,37 @@ type RequiredStatusChecks struct {
 func LoadProtectionsSpecFromState(states []state.Protection) Protections {
 	specs := make([]Protection, len(states))
 	for i, protection := range states {
-		requiredStatusChecks := RequiredStatusChecks{
-			Strict:   protection.RequiredStatusChecks.Strict,
-			Contexts: protection.RequiredStatusChecks.Contexts,
-		}
-
-		dismissalRestrictions := Restrictions{
-			Users: protection.RequiredPullRequestReviews.DismissalRestrictions.Users,
-			Teams: protection.RequiredPullRequestReviews.DismissalRestrictions.Teams,
-		}
-
-		requiredPullRequestReviews := RequiredPullRequestReviews{
-			DismissalRestrictions:        dismissalRestrictions,
-			DismissStaleReviews:          protection.RequiredPullRequestReviews.DismissStaleReviews,
-			RequireCodeOwnerReviews:      protection.RequiredPullRequestReviews.RequireCodeOwnerReviews,
-			RequiredApprovingReviewCount: protection.RequiredPullRequestReviews.RequiredApprovingReviewCount,
-		}
-
-		restrictions := Restrictions{
-			Users: protection.Restrictions.Users,
-			Teams: protection.Restrictions.Teams,
-		}
-
 		specs[i] = Protection{
-			Branch:                     protection.Branch,
-			RequiredStatusChecks:       &requiredStatusChecks,
-			EnforceAdmins:              &protection.EnforceAdmins,
-			RequiredPullRequestReviews: &requiredPullRequestReviews,
-			Restrictions:               &restrictions,
+			Branch:        protection.Branch,
+			EnforceAdmins: protection.EnforceAdmins,
+		}
+
+		if protection.RequiredPullRequestReviews != nil {
+			dismissalRestrictions := Restrictions{
+				Users: protection.RequiredPullRequestReviews.DismissalRestrictions.Users,
+				Teams: protection.RequiredPullRequestReviews.DismissalRestrictions.Teams,
+			}
+
+			specs[i].RequiredPullRequestReviews = &RequiredPullRequestReviews{
+				DismissalRestrictions:        dismissalRestrictions,
+				DismissStaleReviews:          protection.RequiredPullRequestReviews.DismissStaleReviews,
+				RequireCodeOwnerReviews:      protection.RequiredPullRequestReviews.RequireCodeOwnerReviews,
+				RequiredApprovingReviewCount: protection.RequiredPullRequestReviews.RequiredApprovingReviewCount,
+			}
+		}
+
+		if protection.RequiredStatusChecks != nil {
+			specs[i].RequiredStatusChecks = &RequiredStatusChecks{
+				Strict:   protection.RequiredStatusChecks.Strict,
+				Contexts: protection.RequiredStatusChecks.Contexts,
+			}
+		}
+
+		if protection.Restrictions != nil {
+			specs[i].Restrictions = &Restrictions{
+				Users: protection.Restrictions.Users,
+				Teams: protection.Restrictions.Teams,
+			}
 		}
 	}
 	return specs
@@ -77,7 +80,7 @@ func (sp *Protection) ToState() *state.Protection {
 	}
 
 	if sp.EnforceAdmins != nil {
-		newState.EnforceAdmins = *sp.EnforceAdmins
+		newState.EnforceAdmins = sp.EnforceAdmins
 	}
 
 	if sp.RequiredPullRequestReviews != nil {

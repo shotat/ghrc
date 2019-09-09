@@ -7,10 +7,10 @@ import (
 
 type Protection struct {
 	Branch                     string
-	RequiredStatusChecks       RequiredStatusChecks
-	EnforceAdmins              bool
-	RequiredPullRequestReviews RequiredPullRequestReviews
-	Restrictions               Restrictions
+	RequiredStatusChecks       *RequiredStatusChecks
+	EnforceAdmins              *bool
+	RequiredPullRequestReviews *RequiredPullRequestReviews
+	Restrictions               *Restrictions
 }
 
 type RequiredPullRequestReviews struct {
@@ -72,8 +72,10 @@ func (p *Protection) Update(ctx context.Context, repoOwner string, repoName stri
 	req := &github.ProtectionRequest{
 		RequiredStatusChecks:       requiredStatusChecks,
 		RequiredPullRequestReviews: requiredPullRequestReviews,
-		EnforceAdmins:              p.EnforceAdmins,
 		// Restrictions:               restrictions,
+	}
+	if p.EnforceAdmins != nil {
+		req.EnforceAdmins = *p.EnforceAdmins
 	}
 	_, _, err := ghc.Repositories.UpdateBranchProtection(ctx, repoOwner, repoName, p.Branch, req)
 	return err
@@ -101,25 +103,27 @@ func FindProtections(ctx context.Context, owner string, repo string) ([]Protecti
 			return nil, err
 		}
 
-		restrictions := Restrictions{
-			Users: []string{},
-			Teams: []string{},
+		protections[i] = Protection{
+			Branch:        pb.GetName(),
+			EnforceAdmins: &p.GetEnforceAdmins().Enabled,
 		}
+
 		if p.GetRestrictions() != nil {
+			restrictions := Restrictions{
+				Users: []string{},
+				Teams: []string{},
+			}
 			for _, u := range p.GetRestrictions().Users {
 				restrictions.Users = append(restrictions.Users, u.GetLogin())
 			}
 			for _, t := range p.GetRestrictions().Teams {
 				restrictions.Teams = append(restrictions.Teams, t.GetSlug())
 			}
+			protections[i].Restrictions = &restrictions
 		}
-		protections[i] = Protection{
-			Branch:        pb.GetName(),
-			EnforceAdmins: p.GetEnforceAdmins().Enabled,
-			Restrictions:  restrictions,
-		}
+
 		if p.GetRequiredStatusChecks() != nil {
-			protections[i].RequiredStatusChecks = RequiredStatusChecks{
+			protections[i].RequiredStatusChecks = &RequiredStatusChecks{
 				Strict:   p.GetRequiredStatusChecks().Strict,
 				Contexts: p.GetRequiredStatusChecks().Contexts,
 			}
@@ -136,7 +140,7 @@ func FindProtections(ctx context.Context, owner string, repo string) ([]Protecti
 			for _, t := range p.GetRequiredPullRequestReviews().DismissalRestrictions.Teams {
 				dismissalRestrictions.Teams = append(dismissalRestrictions.Teams, t.GetSlug())
 			}
-			protections[i].RequiredPullRequestReviews = RequiredPullRequestReviews{
+			protections[i].RequiredPullRequestReviews = &RequiredPullRequestReviews{
 				DismissalRestrictions:        dismissalRestrictions,
 				DismissStaleReviews:          p.GetRequiredPullRequestReviews().DismissStaleReviews,
 				RequireCodeOwnerReviews:      p.GetRequiredPullRequestReviews().RequireCodeOwnerReviews,
