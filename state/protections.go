@@ -31,10 +31,22 @@ type RequiredStatusChecks struct {
 }
 
 func (p *Protection) Update(ctx context.Context, repoOwner string, repoName string) error {
+	requiredStatusChecks := &github.RequiredStatusChecks{
+		Strict:   p.RequiredStatusChecks.Strict,
+		Contexts: p.RequiredStatusChecks.Contexts,
+	}
+
+	requiredPullRequestReviews := &github.PullRequestReviewsEnforcementRequest{
+		// DismissalRestrictions        Restrictions
+		DismissStaleReviews:          p.RequiredPullRequestReviews.DismissStaleReviews,
+		RequireCodeOwnerReviews:      p.RequiredPullRequestReviews.RequireCodeOwnerReviews,
+		RequiredApprovingReviewCount: p.RequiredPullRequestReviews.RequiredApprovingReviewCount,
+	}
+
 	req := &github.ProtectionRequest{
-		// RequiredStatusChecks:       p.RequiredStatusChecks,
-		// RequiredPullRequestReviews: p.RequiredPullRequestReviews,
-		EnforceAdmins: p.EnforceAdmins,
+		RequiredStatusChecks:       requiredStatusChecks,
+		RequiredPullRequestReviews: requiredPullRequestReviews,
+		EnforceAdmins:              p.EnforceAdmins,
 		// Restrictions:               p.Restrictions,
 	}
 	_, _, err := ghc.Repositories.UpdateBranchProtection(ctx, repoOwner, repoName, p.Branch, req)
