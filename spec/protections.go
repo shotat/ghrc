@@ -29,6 +29,21 @@ type RequiredStatusCheck struct {
 	Contexts []string `yaml:"contexts"`
 }
 
+func LoadProtectionsSpecFromState(states []state.Protection) Protections {
+	specs := make([]Protection, len(states))
+	// TODO
+	for i, protection := range states {
+		specs[i] = Protection{
+			Branch:                     protection.Branch,
+			RequiredStatusCheck:        nil,
+			EnforceAdmins:              protection.EnforceAdmins,
+			RequiredPullRequestReviews: nil,
+			Restrictions:               nil,
+		}
+	}
+	return specs
+}
+
 // ToState merge state and spec to generate new state
 func (sp *Protection) ToState(base *state.Protection) *state.Protection {
 	newState := &state.Protection{}

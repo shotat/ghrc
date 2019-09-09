@@ -59,11 +59,14 @@ func Import(ctx context.Context, owner string, name string) (*Config, error) {
 		return nil, err
 	}
 
-	conf.Spec.Repo = spec.LoadRepoSpecFromState(repo)
-	conf.Spec.Labels = spec.LoadLabelsSpecFromSpec(labels)
+	protections, err := state.FindProtections(ctx, owner, name)
+	if err != nil {
+		return nil, err
+	}
 
-	// TODO
-	// spec.Protections = repo.Protections
+	conf.Spec.Repo = spec.LoadRepoSpecFromState(repo)
+	conf.Spec.Labels = spec.LoadLabelsSpecFromState(labels)
+	conf.Spec.Protections = spec.LoadProtectionsSpecFromState(protections)
 
 	return conf, nil
 }

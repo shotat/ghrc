@@ -12,7 +12,7 @@ type Label struct {
 
 type Labels []Label
 
-func LoadLabelsSpecFromSpec(states []state.Label) Labels {
+func LoadLabelsSpecFromState(states []state.Label) Labels {
 	specs := make([]Label, len(states))
 	for i, label := range states {
 		specs[i] = Label{
