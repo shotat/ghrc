@@ -7,7 +7,7 @@ import (
 
 type Protection struct {
 	Branch                     string
-	RequiredStatusCheck        RequiredStatusCheck
+	RequiredStatusChecks       RequiredStatusChecks
 	EnforceAdmins              bool
 	RequiredPullRequestReviews RequiredPullRequestReviews
 	Restrictions               Restrictions
@@ -25,17 +25,17 @@ type Restrictions struct {
 	Teams []string
 }
 
-type RequiredStatusCheck struct {
+type RequiredStatusChecks struct {
 	Strict   bool
 	Contexts []string
 }
 
 func (p *Protection) Update(ctx context.Context, repoOwner string, repoName string) error {
 	req := &github.ProtectionRequest{
-		RequiredStatusChecks:       nil,
-		RequiredPullRequestReviews: nil,
-		EnforceAdmins:              p.EnforceAdmins,
-		Restrictions:               nil,
+		// RequiredStatusChecks:       p.RequiredStatusChecks,
+		// RequiredPullRequestReviews: p.RequiredPullRequestReviews,
+		EnforceAdmins: p.EnforceAdmins,
+		// Restrictions:               p.Restrictions,
 	}
 	_, _, err := ghc.Repositories.UpdateBranchProtection(ctx, repoOwner, repoName, p.Branch, req)
 	return err
@@ -86,7 +86,7 @@ func FindProtections(ctx context.Context, owner string, repo string) ([]Protecti
 		}
 		protections[i] = Protection{
 			Branch: pb.GetName(),
-			RequiredStatusCheck: RequiredStatusCheck{
+			RequiredStatusChecks: RequiredStatusChecks{
 				Strict:   p.GetRequiredStatusChecks().Strict,
 				Contexts: p.GetRequiredStatusChecks().Contexts,
 			},

@@ -4,7 +4,7 @@ import "github.com/shotat/ghrc/state"
 
 type Protection struct {
 	Branch                     string                     `yaml:"branch"`
-	RequiredStatusCheck        RequiredStatusCheck        `yaml:"requiredStatusCheck"`
+	RequiredStatusChecks       RequiredStatusChecks       `yaml:"requiredStatusChecks"`
 	EnforceAdmins              bool                       `yaml:"enforceAdmins"`
 	RequiredPullRequestReviews RequiredPullRequestReviews `yaml:"requiredPullRequestReviews"`
 	Restrictions               Restrictions               `yaml:"restrictions"`
@@ -24,7 +24,7 @@ type Restrictions struct {
 	Teams []string `yaml:"teams"`
 }
 
-type RequiredStatusCheck struct {
+type RequiredStatusChecks struct {
 	Strict   bool     `yaml:"strict"`
 	Contexts []string `yaml:"contexts"`
 }
@@ -32,9 +32,9 @@ type RequiredStatusCheck struct {
 func LoadProtectionsSpecFromState(states []state.Protection) Protections {
 	specs := make([]Protection, len(states))
 	for i, protection := range states {
-		requiredStatusCheck := RequiredStatusCheck{
-			Strict:   protection.RequiredStatusCheck.Strict,
-			Contexts: protection.RequiredStatusCheck.Contexts,
+		requiredStatusChecks := RequiredStatusChecks{
+			Strict:   protection.RequiredStatusChecks.Strict,
+			Contexts: protection.RequiredStatusChecks.Contexts,
 		}
 
 		dismissalRestrictions := Restrictions{
@@ -56,7 +56,7 @@ func LoadProtectionsSpecFromState(states []state.Protection) Protections {
 
 		specs[i] = Protection{
 			Branch:                     protection.Branch,
-			RequiredStatusCheck:        requiredStatusCheck,
+			RequiredStatusChecks:       requiredStatusChecks,
 			EnforceAdmins:              protection.EnforceAdmins,
 			RequiredPullRequestReviews: requiredPullRequestReviews,
 			Restrictions:               restrictions,
@@ -71,7 +71,7 @@ func (sp *Protection) ToState(base *state.Protection) *state.Protection {
 	// initialize
 	if base != nil {
 		newState.Branch = base.Branch
-		newState.RequiredStatusCheck = base.RequiredStatusCheck
+		newState.RequiredStatusChecks = base.RequiredStatusChecks
 		newState.EnforceAdmins = base.EnforceAdmins
 		newState.RequiredPullRequestReviews = base.RequiredPullRequestReviews
 		newState.Restrictions = base.Restrictions
