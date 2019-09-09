@@ -101,17 +101,6 @@ func FindProtections(ctx context.Context, owner string, repo string) ([]Protecti
 			return nil, err
 		}
 
-		dismissalRestrictions := Restrictions{
-			Users: []string{},
-			Teams: []string{},
-		}
-		for _, u := range p.GetRequiredPullRequestReviews().DismissalRestrictions.Users {
-			dismissalRestrictions.Users = append(dismissalRestrictions.Users, u.GetLogin())
-		}
-		for _, t := range p.GetRequiredPullRequestReviews().DismissalRestrictions.Teams {
-			dismissalRestrictions.Teams = append(dismissalRestrictions.Teams, t.GetSlug())
-		}
-
 		restrictions := Restrictions{
 			Users: []string{},
 			Teams: []string{},
@@ -125,19 +114,34 @@ func FindProtections(ctx context.Context, owner string, repo string) ([]Protecti
 			}
 		}
 		protections[i] = Protection{
-			Branch: pb.GetName(),
-			RequiredStatusChecks: RequiredStatusChecks{
+			Branch:        pb.GetName(),
+			EnforceAdmins: p.GetEnforceAdmins().Enabled,
+			Restrictions:  restrictions,
+		}
+		if p.GetRequiredStatusChecks() != nil {
+			protections[i].RequiredStatusChecks = RequiredStatusChecks{
 				Strict:   p.GetRequiredStatusChecks().Strict,
 				Contexts: p.GetRequiredStatusChecks().Contexts,
-			},
-			EnforceAdmins: p.GetEnforceAdmins().Enabled,
-			RequiredPullRequestReviews: RequiredPullRequestReviews{
+			}
+		}
+
+		if p.GetRequiredPullRequestReviews() != nil {
+			dismissalRestrictions := Restrictions{
+				Users: []string{},
+				Teams: []string{},
+			}
+			for _, u := range p.GetRequiredPullRequestReviews().DismissalRestrictions.Users {
+				dismissalRestrictions.Users = append(dismissalRestrictions.Users, u.GetLogin())
+			}
+			for _, t := range p.GetRequiredPullRequestReviews().DismissalRestrictions.Teams {
+				dismissalRestrictions.Teams = append(dismissalRestrictions.Teams, t.GetSlug())
+			}
+			protections[i].RequiredPullRequestReviews = RequiredPullRequestReviews{
 				DismissalRestrictions:        dismissalRestrictions,
 				DismissStaleReviews:          p.GetRequiredPullRequestReviews().DismissStaleReviews,
 				RequireCodeOwnerReviews:      p.GetRequiredPullRequestReviews().RequireCodeOwnerReviews,
 				RequiredApprovingReviewCount: p.GetRequiredPullRequestReviews().RequiredApprovingReviewCount,
-			},
-			Restrictions: restrictions,
+			}
 		}
 	}
 	return protections, err
