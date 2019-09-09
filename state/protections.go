@@ -6,15 +6,15 @@ import (
 )
 
 type Protection struct {
-	Branch                     *string
-	RequiredStatusCheck        *RequiredStatusCheck
-	EnforceAdmins              *bool
-	RequiredPullRequestReviews *RequiredPullRequestReviews
-	Restrictions               *Restrictions
+	Branch                     string
+	RequiredStatusCheck        RequiredStatusCheck
+	EnforceAdmins              bool
+	RequiredPullRequestReviews RequiredPullRequestReviews
+	Restrictions               Restrictions
 }
 
 type RequiredPullRequestReviews struct {
-	DismissalRestrictions        *Restrictions
+	DismissalRestrictions        Restrictions
 	DismissStaleReviews          bool
 	RequireCodeOwnerReviews      bool
 	RequiredApprovingReviewCount int
@@ -34,15 +34,15 @@ func (p *Protection) Update(ctx context.Context, repoOwner string, repoName stri
 	req := &github.ProtectionRequest{
 		RequiredStatusChecks:       nil,
 		RequiredPullRequestReviews: nil,
-		EnforceAdmins:              *p.EnforceAdmins,
+		EnforceAdmins:              p.EnforceAdmins,
 		Restrictions:               nil,
 	}
-	_, _, err := ghc.Repositories.UpdateBranchProtection(ctx, repoOwner, repoName, *p.Branch, req)
+	_, _, err := ghc.Repositories.UpdateBranchProtection(ctx, repoOwner, repoName, p.Branch, req)
 	return err
 }
 
 func (p *Protection) Destroy(ctx context.Context, repoOwner string, repoName string) error {
-	_, err := ghc.Repositories.RemoveBranchProtection(ctx, repoOwner, repoName, *p.Branch)
+	_, err := ghc.Repositories.RemoveBranchProtection(ctx, repoOwner, repoName, p.Branch)
 	return err
 }
 
@@ -63,20 +63,20 @@ func FindProtections(ctx context.Context, owner string, repo string) ([]Protecti
 			return nil, err
 		}
 		protections[i] = Protection{
-			Branch: pb.Name,
+			Branch: pb.GetName(),
 
-			RequiredStatusCheck: &RequiredStatusCheck{
+			RequiredStatusCheck: RequiredStatusCheck{
 				Strict:   p.GetRequiredStatusChecks().Strict,
 				Contexts: p.GetRequiredStatusChecks().Contexts,
 			},
-			EnforceAdmins: &p.GetEnforceAdmins().Enabled,
-			RequiredPullRequestReviews: &RequiredPullRequestReviews{
-				DismissalRestrictions:        nil, // TODO
+			EnforceAdmins: p.GetEnforceAdmins().Enabled,
+			RequiredPullRequestReviews: RequiredPullRequestReviews{
+				// DismissalRestrictions:        nil, // TODO
 				DismissStaleReviews:          p.GetRequiredPullRequestReviews().DismissStaleReviews,
 				RequireCodeOwnerReviews:      p.GetRequiredPullRequestReviews().RequireCodeOwnerReviews,
 				RequiredApprovingReviewCount: p.GetRequiredPullRequestReviews().RequiredApprovingReviewCount,
 			},
-			Restrictions: nil, // TODO
+			// Restrictions: nil, // TODO
 		}
 	}
 	return protections, err
