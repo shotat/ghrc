@@ -8,14 +8,14 @@ import (
 
 type Repo struct {
 	ID               int64
-	Name             string
+	Name             string // required?
 	Owner            string
-	Description      *string
-	Homepage         *string
-	Private          *bool
-	AllowSquashMerge *bool
-	AllowMergeCommit *bool
-	AllowRebaseMerge *bool
+	Description      string
+	Homepage         string
+	Private          bool
+	AllowSquashMerge bool
+	AllowMergeCommit bool
+	AllowRebaseMerge bool
 	Topics           []string
 }
 
@@ -28,25 +28,25 @@ func FindRepo(ctx context.Context, owner string, name string) (*Repo, error) {
 		ID:               repo.GetID(),
 		Name:             repo.GetName(),
 		Owner:            repo.GetOwner().GetLogin(),
-		Homepage:         repo.Homepage,
-		Description:      repo.Description,
-		Private:          repo.Private,
+		Homepage:         repo.GetHomepage(),
+		Description:      repo.GetDescription(),
+		Private:          repo.GetPrivate(),
 		Topics:           repo.Topics,
-		AllowSquashMerge: repo.AllowSquashMerge,
-		AllowMergeCommit: repo.AllowMergeCommit,
-		AllowRebaseMerge: repo.AllowRebaseMerge,
+		AllowSquashMerge: repo.GetAllowSquashMerge(),
+		AllowMergeCommit: repo.GetAllowMergeCommit(),
+		AllowRebaseMerge: repo.GetAllowRebaseMerge(),
 	}, nil
 }
 
 func (s *Repo) Update(ctx context.Context, repoOwner string, repoName string) error {
 	repo := new(github.Repository)
 	repo.Name = &s.Name
-	repo.Description = s.Description
-	repo.Homepage = s.Homepage
-	repo.Private = s.Private
-	repo.AllowRebaseMerge = s.AllowRebaseMerge
-	repo.AllowSquashMerge = s.AllowSquashMerge
-	repo.AllowMergeCommit = s.AllowMergeCommit
+	repo.Description = &s.Description
+	repo.Homepage = &s.Homepage
+	repo.Private = &s.Private
+	repo.AllowRebaseMerge = &s.AllowRebaseMerge
+	repo.AllowSquashMerge = &s.AllowSquashMerge
+	repo.AllowMergeCommit = &s.AllowMergeCommit
 
 	if _, _, err := ghc.Repositories.Edit(ctx, repoOwner, repoName, repo); err != nil {
 		return err

@@ -78,11 +78,13 @@ func FindProtections(ctx context.Context, owner string, repo string) ([]Protecti
 			Users: []string{},
 			Teams: []string{},
 		}
-		for _, u := range p.GetRestrictions().Users {
-			restrictions.Users = append(restrictions.Users, u.GetLogin())
-		}
-		for _, t := range p.GetRestrictions().Teams {
-			restrictions.Teams = append(restrictions.Teams, t.GetSlug())
+		if p.GetRestrictions() != nil {
+			for _, u := range p.GetRestrictions().Users {
+				restrictions.Users = append(restrictions.Users, u.GetLogin())
+			}
+			for _, t := range p.GetRestrictions().Teams {
+				restrictions.Teams = append(restrictions.Teams, t.GetSlug())
+			}
 		}
 		protections[i] = Protection{
 			Branch: pb.GetName(),

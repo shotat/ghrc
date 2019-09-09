@@ -5,14 +5,14 @@ import (
 )
 
 type Repo struct {
-	Description      *string `yaml:"description,omitempty"`
-	Homepage         *string `yaml:"homepage,omitempty"`
-	Private          *bool   `yaml:"private"`
-	AllowSquashMerge *bool   `yaml:"allowSquashMerge"`
-	AllowMergeCommit *bool   `yaml:"allowMergeCommit"`
-	AllowRebaseMerge *bool   `yaml:"allowRebaseMerge"`
+	Description      string `yaml:"description"`
+	Homepage         string `yaml:"homepage"`
+	Private          bool   `yaml:"private"`
+	AllowSquashMerge bool   `yaml:"allowSquashMerge"`
+	AllowMergeCommit bool   `yaml:"allowMergeCommit"`
+	AllowRebaseMerge bool   `yaml:"allowRebaseMerge"`
 
-	Topics []string `yaml:"topics,omitempty"`
+	Topics []string `yaml:"topics"`
 }
 
 func LoadRepoSpecFromState(st *state.Repo) *Repo {
