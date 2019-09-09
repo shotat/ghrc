@@ -5,14 +5,14 @@ import (
 )
 
 type Label struct {
-	Name        string  `yaml:"name"`
-	Description *string `yaml:"description,omitempty"`
-	Color       string  `yaml:"color"`
+	Name        string `yaml:"name"`
+	Description string `yaml:"description"`
+	Color       string `yaml:"color"`
 }
 
 type Labels []Label
 
-func LoadLabelsSpecFromSpec(states []state.Label) Labels {
+func LoadLabelsSpecFromState(states []state.Label) Labels {
 	specs := make([]Label, len(states))
 	for i, label := range states {
 		specs[i] = Label{
@@ -24,14 +24,11 @@ func LoadLabelsSpecFromSpec(states []state.Label) Labels {
 	return specs
 }
 
-// ToState merge state and spec to generate new state
-func (sp *Label) ToState(base *state.Label) *state.Label {
+// ToState generates a new state
+func (sp *Label) ToState() *state.Label {
 	newState := &state.Label{}
-	// initialize
-	if base != nil {
-		newState.Description = base.Description
-	}
 	newState.Name = sp.Name
 	newState.Color = sp.Color
+	newState.Description = sp.Description
 	return newState
 }
