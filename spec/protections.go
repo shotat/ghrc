@@ -31,7 +31,6 @@ type RequiredStatusCheck struct {
 
 func LoadProtectionsSpecFromState(states []state.Protection) Protections {
 	specs := make([]Protection, len(states))
-	// TODO
 	for i, protection := range states {
 		requiredStatusCheck := RequiredStatusCheck{
 			Strict:   protection.RequiredStatusCheck.Strict,

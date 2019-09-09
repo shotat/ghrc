@@ -62,21 +62,42 @@ func FindProtections(ctx context.Context, owner string, repo string) ([]Protecti
 		if err != nil {
 			return nil, err
 		}
+
+		dismissalRestrictions := Restrictions{
+			Users: []string{},
+			Teams: []string{},
+		}
+		for _, u := range p.GetRequiredPullRequestReviews().DismissalRestrictions.Users {
+			dismissalRestrictions.Users = append(dismissalRestrictions.Users, u.GetLogin())
+		}
+		for _, t := range p.GetRequiredPullRequestReviews().DismissalRestrictions.Teams {
+			dismissalRestrictions.Teams = append(dismissalRestrictions.Teams, t.GetSlug())
+		}
+
+		restrictions := Restrictions{
+			Users: []string{},
+			Teams: []string{},
+		}
+		for _, u := range p.GetRestrictions().Users {
+			restrictions.Users = append(restrictions.Users, u.GetLogin())
+		}
+		for _, t := range p.GetRestrictions().Teams {
+			restrictions.Teams = append(restrictions.Teams, t.GetSlug())
+		}
 		protections[i] = Protection{
 			Branch: pb.GetName(),
-
 			RequiredStatusCheck: RequiredStatusCheck{
 				Strict:   p.GetRequiredStatusChecks().Strict,
 				Contexts: p.GetRequiredStatusChecks().Contexts,
 			},
 			EnforceAdmins: p.GetEnforceAdmins().Enabled,
 			RequiredPullRequestReviews: RequiredPullRequestReviews{
-				// DismissalRestrictions:        nil, // TODO
+				DismissalRestrictions:        dismissalRestrictions,
 				DismissStaleReviews:          p.GetRequiredPullRequestReviews().DismissStaleReviews,
 				RequireCodeOwnerReviews:      p.GetRequiredPullRequestReviews().RequireCodeOwnerReviews,
 				RequiredApprovingReviewCount: p.GetRequiredPullRequestReviews().RequiredApprovingReviewCount,
 			},
-			// Restrictions: nil, // TODO
+			Restrictions: restrictions,
 		}
 	}
 	return protections, err
