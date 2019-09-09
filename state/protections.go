@@ -59,8 +59,11 @@ func (p *Protection) Update(ctx context.Context, repoOwner string, repoName stri
 		dismissalRestrictions.Teams = &tmp
 	}
 
+	// FIXME: only org
+	_ = dismissalRestrictions
+	_ = restrictions
 	requiredPullRequestReviews := &github.PullRequestReviewsEnforcementRequest{
-		DismissalRestrictionsRequest: dismissalRestrictions,
+		// DismissalRestrictionsRequest: dismissalRestrictions,
 		DismissStaleReviews:          p.RequiredPullRequestReviews.DismissStaleReviews,
 		RequireCodeOwnerReviews:      p.RequiredPullRequestReviews.RequireCodeOwnerReviews,
 		RequiredApprovingReviewCount: p.RequiredPullRequestReviews.RequiredApprovingReviewCount,
@@ -70,7 +73,7 @@ func (p *Protection) Update(ctx context.Context, repoOwner string, repoName stri
 		RequiredStatusChecks:       requiredStatusChecks,
 		RequiredPullRequestReviews: requiredPullRequestReviews,
 		EnforceAdmins:              p.EnforceAdmins,
-		Restrictions:               restrictions,
+		// Restrictions:               restrictions,
 	}
 	_, _, err := ghc.Repositories.UpdateBranchProtection(ctx, repoOwner, repoName, p.Branch, req)
 	return err
