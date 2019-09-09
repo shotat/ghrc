@@ -6,9 +6,8 @@ import (
 )
 
 type Label struct {
-	ID          *int64
 	Name        string
-	Description *string
+	Description string
 	Color       string
 }
 
@@ -16,7 +15,7 @@ func (l *Label) Create(ctx context.Context, repoOwner string, repoName string) e
 	ghl := &github.Label{
 		Name:        &l.Name,
 		Color:       &l.Color,
-		Description: l.Description,
+		Description: &l.Description,
 	}
 	_, _, err := ghc.Issues.CreateLabel(ctx, repoOwner, repoName, ghl)
 	return err
@@ -26,7 +25,7 @@ func (l *Label) Update(ctx context.Context, repoOwner string, repoName string) e
 	ghl := &github.Label{
 		Name:        &l.Name,
 		Color:       &l.Color,
-		Description: l.Description,
+		Description: &l.Description,
 	}
 	_, _, err := ghc.Issues.EditLabel(ctx, repoOwner, repoName, l.Name, ghl)
 	return err
@@ -45,9 +44,8 @@ func FindLabels(ctx context.Context, owner string, repo string) ([]Label, error)
 	labels := make([]Label, len(ghLabels))
 	for i, label := range ghLabels {
 		labels[i] = Label{
-			ID:          label.ID,
 			Name:        label.GetName(),
-			Description: label.Description,
+			Description: label.GetDescription(),
 			Color:       label.GetColor(),
 		}
 	}
