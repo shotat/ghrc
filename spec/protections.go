@@ -65,18 +65,24 @@ func LoadProtectionsSpecFromState(states []state.Protection) Protections {
 	return specs
 }
 
-// ToState merge state and spec to generate new state
-func (sp *Protection) ToState(base *state.Protection) *state.Protection {
+// ToState returns a new state
+func (sp *Protection) ToState() *state.Protection {
 	newState := &state.Protection{}
-	// initialize
-	if base != nil {
-		newState.Branch = base.Branch
-		newState.RequiredStatusChecks = base.RequiredStatusChecks
-		newState.EnforceAdmins = base.EnforceAdmins
-		newState.RequiredPullRequestReviews = base.RequiredPullRequestReviews
-		newState.Restrictions = base.Restrictions
-	}
+
+	newState.Branch = sp.Branch
+
+	newState.RequiredStatusChecks.Strict = sp.RequiredStatusChecks.Strict
+	newState.RequiredStatusChecks.Contexts = sp.RequiredStatusChecks.Contexts
+
 	newState.EnforceAdmins = sp.EnforceAdmins
-	// TODO
+
+	newState.RequiredPullRequestReviews.RequiredApprovingReviewCount = sp.RequiredPullRequestReviews.RequiredApprovingReviewCount
+	newState.RequiredPullRequestReviews.DismissStaleReviews = sp.RequiredPullRequestReviews.DismissStaleReviews
+	newState.RequiredPullRequestReviews.RequireCodeOwnerReviews = sp.RequiredPullRequestReviews.RequireCodeOwnerReviews
+	newState.RequiredPullRequestReviews.DismissalRestrictions.Users = sp.RequiredPullRequestReviews.DismissalRestrictions.Users
+	newState.RequiredPullRequestReviews.DismissalRestrictions.Teams = sp.RequiredPullRequestReviews.DismissalRestrictions.Teams
+
+	newState.Restrictions.Users = sp.Restrictions.Users
+	newState.Restrictions.Teams = sp.Restrictions.Teams
 	return newState
 }
