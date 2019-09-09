@@ -34,7 +34,7 @@ spec:
     requiredStatusChecks:
       strict: false
       contexts: []
-    enforceAdmins: true
+    enforceAdmins: false
     requiredPullRequestReviews:
       dismissalRestrictions:
         users: []
