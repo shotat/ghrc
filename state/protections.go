@@ -36,8 +36,31 @@ func (p *Protection) Update(ctx context.Context, repoOwner string, repoName stri
 		Contexts: p.RequiredStatusChecks.Contexts,
 	}
 
+	restrictions := &github.BranchRestrictionsRequest{
+		Users: []string{},
+		Teams: []string{},
+	}
+	for _, u := range p.Restrictions.Users {
+		restrictions.Users = append(restrictions.Users, u)
+	}
+	for _, t := range p.Restrictions.Teams {
+		restrictions.Teams = append(restrictions.Teams, t)
+	}
+	dismissalRestrictions := &github.DismissalRestrictionsRequest{
+		Users: &[]string{},
+		Teams: &[]string{},
+	}
+	for _, u := range p.RequiredPullRequestReviews.DismissalRestrictions.Users {
+		tmp := append(*dismissalRestrictions.Users, u)
+		dismissalRestrictions.Users = &tmp
+	}
+	for _, t := range p.RequiredPullRequestReviews.DismissalRestrictions.Teams {
+		tmp := append(*dismissalRestrictions.Teams, t)
+		dismissalRestrictions.Teams = &tmp
+	}
+
 	requiredPullRequestReviews := &github.PullRequestReviewsEnforcementRequest{
-		// DismissalRestrictions        Restrictions
+		DismissalRestrictionsRequest: dismissalRestrictions,
 		DismissStaleReviews:          p.RequiredPullRequestReviews.DismissStaleReviews,
 		RequireCodeOwnerReviews:      p.RequiredPullRequestReviews.RequireCodeOwnerReviews,
 		RequiredApprovingReviewCount: p.RequiredPullRequestReviews.RequiredApprovingReviewCount,
@@ -47,7 +70,7 @@ func (p *Protection) Update(ctx context.Context, repoOwner string, repoName stri
 		RequiredStatusChecks:       requiredStatusChecks,
 		RequiredPullRequestReviews: requiredPullRequestReviews,
 		EnforceAdmins:              p.EnforceAdmins,
-		// Restrictions:               p.Restrictions,
+		Restrictions:               restrictions,
 	}
 	_, _, err := ghc.Repositories.UpdateBranchProtection(ctx, repoOwner, repoName, p.Branch, req)
 	return err
