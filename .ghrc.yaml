@@ -3,29 +3,46 @@ metadata:
   name: ghrc
 spec:
   repo:
-    description: I'm awesome!!!
+    description: GHRC is a tool for managing GitHub Repository Configurations in a
+      declarative way.
     homepage: ""
     private: false
-    topics:
-    - go
-    - github
-    allowRebaseMerge: false
     allowSquashMerge: true
-    allowMergeCommit: null
+    allowMergeCommit: false
+    allowRebaseMerge: false
+    topics:
+    - cli
+    - git
+    - github
+    - go
+    - infrastructure-as-code
   labels:
-    - name: "bug :bug:"
-      description: "Small bug fix required"
-      color: "b01f26"
-    - name: "skip_ci"
-      description: ""
-      color: "000000"
-    - name: duplicate
-      color: "123456"
+  - name: bug
+    description: Something isn't working
+    color: d73a4a
+  - name: documentation
+    description: Improvements or additions to documentation
+    color: 0075ca
+  - name: question
+    description: Further information is requested
+    color: d876e3
+  - name: review
+    description: ""
+    color: ffffff
   protections:
   - branch: master
     requiredStatusChecks:
-      strict: true
+      strict: false
       contexts: []
-    enforceAdmins: false
-    requiredPullRequestReviews: null
-    restrictions: null
+    enforceAdmins: true
+    requiredPullRequestReviews:
+      dismissalRestrictions:
+        users: []
+        teams: []
+      dismissStaleReviews: false
+      requireCodeOwnerReviews: false
+      requiredApprovingReviewCount: 1
+    restrictions:
+      users: []
+      teams: []
+
