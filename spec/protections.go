@@ -13,10 +13,10 @@ type Protection struct {
 type Protections []Protection
 
 type RequiredPullRequestReviews struct {
-	DismissalRestrictions        Restrictions `yaml:"dismissalRestrictions"`
-	DismissStaleReviews          bool         `yaml:"dismissStaleReviews"`
-	RequireCodeOwnerReviews      bool         `yaml:"requireCodeOwnerReviews"`
-	RequiredApprovingReviewCount int          `yaml:"requiredApprovingReviewCount"`
+	// DismissalRestrictions        Restrictions `yaml:"dismissalRestrictions"`
+	DismissStaleReviews          bool `yaml:"dismissStaleReviews"`
+	RequireCodeOwnerReviews      bool `yaml:"requireCodeOwnerReviews"`
+	RequiredApprovingReviewCount int  `yaml:"requiredApprovingReviewCount"`
 }
 
 type Restrictions struct {
@@ -38,13 +38,16 @@ func LoadProtectionsSpecFromState(states []state.Protection) Protections {
 		}
 
 		if protection.RequiredPullRequestReviews != nil {
-			dismissalRestrictions := Restrictions{
-				Users: protection.RequiredPullRequestReviews.DismissalRestrictions.Users,
-				Teams: protection.RequiredPullRequestReviews.DismissalRestrictions.Teams,
-			}
+			// FIXME support
+			/*
+				dismissalRestrictions := Restrictions{
+					Users: protection.RequiredPullRequestReviews.DismissalRestrictions.Users,
+					Teams: protection.RequiredPullRequestReviews.DismissalRestrictions.Teams,
+				}
+			*/
 
 			specs[i].RequiredPullRequestReviews = &RequiredPullRequestReviews{
-				DismissalRestrictions:        dismissalRestrictions,
+				// DismissalRestrictions:        dismissalRestrictions,
 				DismissStaleReviews:          protection.RequiredPullRequestReviews.DismissStaleReviews,
 				RequireCodeOwnerReviews:      protection.RequiredPullRequestReviews.RequireCodeOwnerReviews,
 				RequiredApprovingReviewCount: protection.RequiredPullRequestReviews.RequiredApprovingReviewCount,
@@ -88,8 +91,8 @@ func (sp *Protection) ToState() *state.Protection {
 		newState.RequiredPullRequestReviews.RequiredApprovingReviewCount = sp.RequiredPullRequestReviews.RequiredApprovingReviewCount
 		newState.RequiredPullRequestReviews.DismissStaleReviews = sp.RequiredPullRequestReviews.DismissStaleReviews
 		newState.RequiredPullRequestReviews.RequireCodeOwnerReviews = sp.RequiredPullRequestReviews.RequireCodeOwnerReviews
-		newState.RequiredPullRequestReviews.DismissalRestrictions.Users = sp.RequiredPullRequestReviews.DismissalRestrictions.Users
-		newState.RequiredPullRequestReviews.DismissalRestrictions.Teams = sp.RequiredPullRequestReviews.DismissalRestrictions.Teams
+		// newState.RequiredPullRequestReviews.DismissalRestrictions.Users = sp.RequiredPullRequestReviews.DismissalRestrictions.Users
+		// newState.RequiredPullRequestReviews.DismissalRestrictions.Teams = sp.RequiredPullRequestReviews.DismissalRestrictions.Teams
 	}
 
 	if sp.Restrictions != nil {

@@ -25,7 +25,7 @@ func NewProtection(branch string) *Protection {
 }
 
 type RequiredPullRequestReviews struct {
-	DismissalRestrictions        Restrictions
+	// DismissalRestrictions        Restrictions
 	DismissStaleReviews          bool
 	RequireCodeOwnerReviews      bool
 	RequiredApprovingReviewCount int
@@ -76,6 +76,7 @@ func (p *Protection) Update(ctx context.Context, repoOwner string, repoName stri
 	}
 
 	if p.RequiredPullRequestReviews != nil {
+		/* FIXME
 		dismissalRestrictions := &github.DismissalRestrictionsRequest{
 			Users: &[]string{},
 			Teams: &[]string{},
@@ -88,6 +89,7 @@ func (p *Protection) Update(ctx context.Context, repoOwner string, repoName stri
 			tmp := append(*dismissalRestrictions.Teams, t)
 			dismissalRestrictions.Teams = &tmp
 		}
+		*/
 
 		req.RequiredPullRequestReviews = &github.PullRequestReviewsEnforcementRequest{
 			// FIXME org only
@@ -161,7 +163,7 @@ func FindProtections(ctx context.Context, owner string, repo string) ([]Protecti
 				dismissalRestrictions.Teams = append(dismissalRestrictions.Teams, t.GetSlug())
 			}
 			protections[i].RequiredPullRequestReviews = &RequiredPullRequestReviews{
-				DismissalRestrictions:        dismissalRestrictions,
+				// DismissalRestrictions:        dismissalRestrictions,
 				DismissStaleReviews:          p.GetRequiredPullRequestReviews().DismissStaleReviews,
 				RequireCodeOwnerReviews:      p.GetRequiredPullRequestReviews().RequireCodeOwnerReviews,
 				RequiredApprovingReviewCount: p.GetRequiredPullRequestReviews().RequiredApprovingReviewCount,
