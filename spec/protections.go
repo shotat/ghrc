@@ -71,14 +71,12 @@ func LoadProtectionsSpecFromState(states []state.Protection) Protections {
 // ToState returns a new state
 func (sp *Protection) ToState() *state.Protection {
 	newState := &state.Protection{}
-
 	newState.Branch = sp.Branch
 
 	if sp.RequiredStatusChecks != nil {
-		newState.RequiredStatusChecks = &state.RequiredStatusChecks{
-			Strict:   sp.RequiredStatusChecks.Strict,
-			Contexts: sp.RequiredStatusChecks.Contexts,
-		}
+		newState.RequiredStatusChecks = &state.RequiredStatusChecks{}
+		newState.RequiredStatusChecks.Strict = sp.RequiredStatusChecks.Strict
+		newState.RequiredStatusChecks.Contexts = sp.RequiredStatusChecks.Contexts
 	}
 
 	if sp.EnforceAdmins != nil {
@@ -86,11 +84,10 @@ func (sp *Protection) ToState() *state.Protection {
 	}
 
 	if sp.RequiredPullRequestReviews != nil {
-		newState.RequiredPullRequestReviews = &state.RequiredPullRequestReviews{
-			RequiredApprovingReviewCount: sp.RequiredPullRequestReviews.RequiredApprovingReviewCount,
-			DismissStaleReviews:          sp.RequiredPullRequestReviews.DismissStaleReviews,
-			RequireCodeOwnerReviews:      sp.RequiredPullRequestReviews.RequireCodeOwnerReviews,
-		}
+		newState.RequiredPullRequestReviews = &state.RequiredPullRequestReviews{}
+		newState.RequiredPullRequestReviews.RequiredApprovingReviewCount = sp.RequiredPullRequestReviews.RequiredApprovingReviewCount
+		newState.RequiredPullRequestReviews.DismissStaleReviews = sp.RequiredPullRequestReviews.DismissStaleReviews
+		newState.RequiredPullRequestReviews.RequireCodeOwnerReviews = sp.RequiredPullRequestReviews.RequireCodeOwnerReviews
 		newState.RequiredPullRequestReviews.DismissalRestrictions.Users = sp.RequiredPullRequestReviews.DismissalRestrictions.Users
 		newState.RequiredPullRequestReviews.DismissalRestrictions.Teams = sp.RequiredPullRequestReviews.DismissalRestrictions.Teams
 	}
