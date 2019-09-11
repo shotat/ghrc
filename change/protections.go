@@ -1,9 +1,12 @@
 package change
 
 import (
+	"bytes"
 	"context"
 	"errors"
+	"fmt"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/shotat/ghrc/spec"
 	"github.com/shotat/ghrc/state"
 )
@@ -14,8 +17,13 @@ type ProtectionChange struct {
 	After  *state.Protection
 }
 
+// FIXME: duplicated
 func (c *ProtectionChange) String() string {
-	return "TODO"
+	buf := bytes.NewBuffer(nil)
+	buf.WriteString(fmt.Sprintf("%s Protection\n", string(c.Action)))
+	diff := cmp.Diff(c.Before, c.After)
+	buf.WriteString(diff)
+	return buf.String()
 }
 
 func (c *ProtectionChange) Apply(ctx context.Context, repoOwner string, repoName string) error {

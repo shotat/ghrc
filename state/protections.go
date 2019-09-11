@@ -13,8 +13,19 @@ type Protection struct {
 	Restrictions               *Restrictions
 }
 
+func NewProtection(branch string) *Protection {
+	enforceAdmins := false
+	return &Protection{
+		Branch:                     branch,
+		RequiredStatusChecks:       &RequiredStatusChecks{},
+		EnforceAdmins:              &enforceAdmins,
+		RequiredPullRequestReviews: &RequiredPullRequestReviews{},
+		Restrictions:               &Restrictions{},
+	}
+}
+
 type RequiredPullRequestReviews struct {
-	DismissalRestrictions        Restrictions
+	// DismissalRestrictions        Restrictions
 	DismissStaleReviews          bool
 	RequireCodeOwnerReviews      bool
 	RequiredApprovingReviewCount int
@@ -31,51 +42,62 @@ type RequiredStatusChecks struct {
 }
 
 func (p *Protection) Update(ctx context.Context, repoOwner string, repoName string) error {
-	requiredStatusChecks := &github.RequiredStatusChecks{
-		Strict:   p.RequiredStatusChecks.Strict,
-		Contexts: p.RequiredStatusChecks.Contexts,
+	req := &github.ProtectionRequest{}
+
+	if p.RequiredStatusChecks != nil && !(p.RequiredStatusChecks.Strict == false && len(p.RequiredStatusChecks.Contexts) == 0) {
+		requiredStatusChecks := &github.RequiredStatusChecks{}
+		requiredStatusChecks.Strict = p.RequiredStatusChecks.Strict
+		if p.RequiredStatusChecks.Contexts != nil {
+			requiredStatusChecks.Contexts = p.RequiredStatusChecks.Contexts
+		} else {
+			requiredStatusChecks.Contexts = []string{}
+		}
+
+		req.RequiredStatusChecks = requiredStatusChecks
 	}
 
-	restrictions := &github.BranchRestrictionsRequest{
-		Users: []string{},
-		Teams: []string{},
-	}
-	for _, u := range p.Restrictions.Users {
-		restrictions.Users = append(restrictions.Users, u)
-	}
-	for _, t := range p.Restrictions.Teams {
-		restrictions.Teams = append(restrictions.Teams, t)
-	}
-	dismissalRestrictions := &github.DismissalRestrictionsRequest{
-		Users: &[]string{},
-		Teams: &[]string{},
-	}
-	for _, u := range p.RequiredPullRequestReviews.DismissalRestrictions.Users {
-		tmp := append(*dismissalRestrictions.Users, u)
-		dismissalRestrictions.Users = &tmp
-	}
-	for _, t := range p.RequiredPullRequestReviews.DismissalRestrictions.Teams {
-		tmp := append(*dismissalRestrictions.Teams, t)
-		dismissalRestrictions.Teams = &tmp
-	}
-
-	// FIXME: only org
-	_ = dismissalRestrictions
-	_ = restrictions
-	requiredPullRequestReviews := &github.PullRequestReviewsEnforcementRequest{
-		// DismissalRestrictionsRequest: dismissalRestrictions,
-		DismissStaleReviews:          p.RequiredPullRequestReviews.DismissStaleReviews,
-		RequireCodeOwnerReviews:      p.RequiredPullRequestReviews.RequireCodeOwnerReviews,
-		RequiredApprovingReviewCount: p.RequiredPullRequestReviews.RequiredApprovingReviewCount,
-	}
-
-	req := &github.ProtectionRequest{
-		RequiredStatusChecks:       requiredStatusChecks,
-		RequiredPullRequestReviews: requiredPullRequestReviews,
-		// Restrictions:               restrictions,
-	}
 	if p.EnforceAdmins != nil {
 		req.EnforceAdmins = *p.EnforceAdmins
+	}
+
+	if p.Restrictions != nil {
+		restrictions := &github.BranchRestrictionsRequest{
+			Users: []string{},
+			Teams: []string{},
+		}
+		for _, u := range p.Restrictions.Users {
+			restrictions.Users = append(restrictions.Users, u)
+		}
+		for _, t := range p.Restrictions.Teams {
+			restrictions.Teams = append(restrictions.Teams, t)
+		}
+
+		req.Restrictions = restrictions
+	}
+
+	if p.RequiredPullRequestReviews != nil {
+		/* FIXME
+		dismissalRestrictions := &github.DismissalRestrictionsRequest{
+			Users: &[]string{},
+			Teams: &[]string{},
+		}
+		for _, u := range p.RequiredPullRequestReviews.DismissalRestrictions.Users {
+			tmp := append(*dismissalRestrictions.Users, u)
+			dismissalRestrictions.Users = &tmp
+		}
+		for _, t := range p.RequiredPullRequestReviews.DismissalRestrictions.Teams {
+			tmp := append(*dismissalRestrictions.Teams, t)
+			dismissalRestrictions.Teams = &tmp
+		}
+		*/
+
+		req.RequiredPullRequestReviews = &github.PullRequestReviewsEnforcementRequest{
+			// FIXME org only
+			// DismissalRestrictionsRequest: dismissalRestrictions,
+			DismissStaleReviews:          p.RequiredPullRequestReviews.DismissStaleReviews,
+			RequireCodeOwnerReviews:      p.RequiredPullRequestReviews.RequireCodeOwnerReviews,
+			RequiredApprovingReviewCount: p.RequiredPullRequestReviews.RequiredApprovingReviewCount,
+		}
 	}
 	_, _, err := ghc.Repositories.UpdateBranchProtection(ctx, repoOwner, repoName, p.Branch, req)
 	return err
@@ -141,7 +163,7 @@ func FindProtections(ctx context.Context, owner string, repo string) ([]Protecti
 				dismissalRestrictions.Teams = append(dismissalRestrictions.Teams, t.GetSlug())
 			}
 			protections[i].RequiredPullRequestReviews = &RequiredPullRequestReviews{
-				DismissalRestrictions:        dismissalRestrictions,
+				// DismissalRestrictions:        dismissalRestrictions,
 				DismissStaleReviews:          p.GetRequiredPullRequestReviews().DismissStaleReviews,
 				RequireCodeOwnerReviews:      p.GetRequiredPullRequestReviews().RequireCodeOwnerReviews,
 				RequiredApprovingReviewCount: p.GetRequiredPullRequestReviews().RequiredApprovingReviewCount,

@@ -7,7 +7,6 @@ import (
 )
 
 type Repo struct {
-	ID               int64
 	Name             string // required?
 	Owner            string
 	Description      string
@@ -25,7 +24,6 @@ func FindRepo(ctx context.Context, owner string, name string) (*Repo, error) {
 		return nil, err
 	}
 	return &Repo{
-		ID:               repo.GetID(),
 		Name:             repo.GetName(),
 		Owner:            repo.GetOwner().GetLogin(),
 		Homepage:         repo.GetHomepage(),
