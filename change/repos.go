@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/shotat/ghrc/spec"
 	"github.com/shotat/ghrc/state"
 )
@@ -22,22 +23,13 @@ func (c *RepoChange) Apply(ctx context.Context, repoOwner string, repoName strin
 func (c *RepoChange) String() string {
 	buf := bytes.NewBuffer(nil)
 	buf.WriteString(fmt.Sprintf("%s Repo\n", string(c.Action)))
-	switch c.Action {
-	case Update:
-		buf.WriteString(fmt.Sprintf("\tdescription\t%v\n", c.After.Description))
-		buf.WriteString(fmt.Sprintf("\thomepage\t%v\n", c.After.Homepage))
-		buf.WriteString(fmt.Sprintf("\tprivate\t%v\n", c.After.Private))
-		buf.WriteString(fmt.Sprintf("\tallowSquashMerge\t%v\n", c.After.AllowSquashMerge))
-		buf.WriteString(fmt.Sprintf("\tallowMergeCommit\t%v\n", c.After.AllowMergeCommit))
-		buf.WriteString(fmt.Sprintf("\tallowRebaseMerge\t%v\n", c.After.AllowRebaseMerge))
-		buf.WriteString(fmt.Sprintf("\ttopics\t%v\n", c.After.Topics))
-	}
+	diff := cmp.Diff(c.Before, c.After)
+	buf.WriteString(diff)
 	return buf.String()
 }
 
 func GetRepoChange(st *state.Repo, sp *spec.Repo) *RepoChange {
 	after := &state.Repo{
-		ID:               st.ID,
 		Name:             st.Name,
 		Owner:            st.Owner,
 		Description:      sp.Description,
