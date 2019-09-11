@@ -89,9 +89,9 @@ func (p *Protection) Update(ctx context.Context, repoOwner string, repoName stri
 			dismissalRestrictions.Teams = &tmp
 		}
 
-		_ = dismissalRestrictions
 		req.RequiredPullRequestReviews = &github.PullRequestReviewsEnforcementRequest{
-			DismissalRestrictionsRequest: dismissalRestrictions,
+			// FIXME org only
+			// DismissalRestrictionsRequest: dismissalRestrictions,
 			DismissStaleReviews:          p.RequiredPullRequestReviews.DismissStaleReviews,
 			RequireCodeOwnerReviews:      p.RequiredPullRequestReviews.RequireCodeOwnerReviews,
 			RequiredApprovingReviewCount: p.RequiredPullRequestReviews.RequiredApprovingReviewCount,
