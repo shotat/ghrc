@@ -5,17 +5,16 @@ spec:
   repo:
     description: GHRC is a tool for managing GitHub Repository Configurations in a
       declarative way.
-    homepage: ""
+    homepage: "https://github.com/shotat/ghrc"
     private: false
-    allowSquashMerge: true
     allowMergeCommit: false
+    allowSquashMerge: true
     allowRebaseMerge: false
     topics:
     - cli
     - git
     - github
     - go
-    - infrastructure-as-code
   labels:
   - name: bug
     description: Something isn't working
@@ -27,8 +26,8 @@ spec:
     description: Further information is requested
     color: d876e3
   - name: review
-    description: ""
-    color: ffffff
+    description: "ready for review"
+    color: f0f0f0
   protections:
   - branch: master
     requiredStatusChecks:
@@ -36,13 +35,16 @@ spec:
       contexts: []
     enforceAdmins: false
     requiredPullRequestReviews:
-      dismissalRestrictions:
-        users: []
-        teams: []
       dismissStaleReviews: false
       requireCodeOwnerReviews: false
       requiredApprovingReviewCount: 1
-    restrictions:
-      users: []
-      teams: []
+  - branch: test
+    requiredStatusChecks:
+      strict: true
+      contexts: []
+    enforceAdmins: true
+    requiredPullRequestReviews:
+      dismissStaleReviews: true
+      requireCodeOwnerReviews: true
+      requiredApprovingReviewCount: 3
 

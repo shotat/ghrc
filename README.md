@@ -1,7 +1,5 @@
 # GHRC
 
-*NOTE: work in progress*
-
 GHRC is a tool for managing **G**it**H**ub **R**epository **C**onfigurations in a declarative way.
 
 Repository configuration includes

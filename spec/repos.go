@@ -8,8 +8,8 @@ type Repo struct {
 	Description      string `yaml:"description"`
 	Homepage         string `yaml:"homepage"`
 	Private          bool   `yaml:"private"`
-	AllowSquashMerge bool   `yaml:"allowSquashMerge"`
 	AllowMergeCommit bool   `yaml:"allowMergeCommit"`
+	AllowSquashMerge bool   `yaml:"allowSquashMerge"`
 	AllowRebaseMerge bool   `yaml:"allowRebaseMerge"`
 
 	Topics []string `yaml:"topics"`
@@ -21,8 +21,8 @@ func LoadRepoSpecFromState(st *state.Repo) *Repo {
 		Description:      st.Description,
 		Private:          st.Private,
 		Topics:           st.Topics,
-		AllowSquashMerge: st.AllowSquashMerge,
 		AllowMergeCommit: st.AllowMergeCommit,
+		AllowSquashMerge: st.AllowSquashMerge,
 		AllowRebaseMerge: st.AllowRebaseMerge,
 	}
 }
