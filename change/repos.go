@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"sort"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/shotat/ghrc/spec"
@@ -23,7 +24,14 @@ func (c *RepoChange) Apply(ctx context.Context, repoOwner string, repoName strin
 func (c *RepoChange) String() string {
 	buf := bytes.NewBuffer(nil)
 	buf.WriteString(fmt.Sprintf("%s Repo\n", string(c.Action)))
-	diff := cmp.Diff(c.Before, c.After)
+
+	// This Transformer sorts a []int.
+	trans := cmp.Transformer("Sort", func(in []string) []string {
+		out := append([]string(nil), in...) // Copy input to avoid mutating it
+		sort.Strings(out)
+		return out
+	})
+	diff := cmp.Diff(c.Before, c.After, trans)
 	buf.WriteString(diff)
 	return buf.String()
 }
