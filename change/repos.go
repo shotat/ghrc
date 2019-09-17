@@ -23,7 +23,7 @@ func (c *RepoChange) Apply(ctx context.Context, repoOwner string, repoName strin
 
 func (c *RepoChange) String() string {
 	buf := bytes.NewBuffer(nil)
-	buf.WriteString(fmt.Sprintf("%s Repo\n", string(c.Action)))
+	buf.WriteString(c.subject())
 
 	// This Transformer sorts a []int.
 	trans := cmp.Transformer("Sort", func(in []string) []string {
@@ -34,6 +34,17 @@ func (c *RepoChange) String() string {
 	diff := cmp.Diff(c.Before, c.After, trans)
 	buf.WriteString(diff)
 	return buf.String()
+}
+
+func (c *RepoChange) subject() string {
+	var name string
+	switch c.Action {
+	case Create, Update:
+		name = fmt.Sprintf("%s/%s", c.After.Owner, c.After.Name)
+	case Delete:
+		name = fmt.Sprintf("%s/%s", c.Before.Owner, c.Before.Name)
+	}
+	return fmt.Sprintf("%s Repo: %s\n", string(c.Action), name)
 }
 
 func GetRepoChange(st *state.Repo, sp *spec.Repo) *RepoChange {

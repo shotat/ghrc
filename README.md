@@ -49,6 +49,54 @@ You can specify a config file explicitly with `-f`.
 $ ghrc plan -f .ghrc.yaml
 ```
 
+**Example Output**
+
+```
+$ ghrc plan
+
+~ Repo: shotat/ghrc
+{*state.Repo}.Description:
+	-: "GHRC is a tool for managing GitHub Repository Configurations in a declarative way."
+	+: "GHRC is an awesome tool for managing GitHub Repository Configurations in a declarative way."
+{*state.Repo}.AllowRebaseMerge:
+	-: false
+	+: true
+Sort({*state.Repo}.Topics)[1->?]:
+	-: "git"
+	+: <non-existent>
+
++ Label: awesome
+{*state.Label}:
+	-: (*state.Label)(nil)
+	+: &state.Label{Name: "awesome", Description: "Awesome issue", Color: "d73a4b"}
+
+~ Label: bug
+{*state.Label}.Color:
+	-: "d73a4a"
+	+: "d73a4b"
+
+~ Label: documentation
+
+~ Label: review
+
+- Label: question
+{*state.Label}:
+	-: &state.Label{Name: "question", Description: "Further information is requested", Color: "d876e3"}
+	+: (*state.Label)(nil)
+
+~ Protection: master
+{*state.Protection}.RequiredStatusChecks.Strict:
+	-: false
+	+: true
+{*state.Protection}.RequiredStatusChecks.Contexts[0->?]:
+	-: "ci/dockercloud"
+	+: <non-existent>
+{*state.Protection}.RequiredPullRequestReviews.RequiredApprovingReviewCount:
+	-: 1
+	+: 2
+```
+
+
 ### Apply specs to the actual state
 
 

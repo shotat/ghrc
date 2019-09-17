@@ -19,10 +19,21 @@ type LabelChange struct {
 
 func (c *LabelChange) String() string {
 	buf := bytes.NewBuffer(nil)
-	buf.WriteString(fmt.Sprintf("%s Label\n", string(c.Action)))
+	buf.WriteString(c.subject())
 	diff := cmp.Diff(c.Before, c.After)
 	buf.WriteString(diff)
 	return buf.String()
+}
+
+func (c *LabelChange) subject() string {
+	var name string
+	switch c.Action {
+	case Create, Update:
+		name = c.After.Name
+	case Delete:
+		name = c.Before.Name
+	}
+	return fmt.Sprintf("%s Label: %s\n", string(c.Action), name)
 }
 
 func (c *LabelChange) Apply(ctx context.Context, repoOwner string, repoName string) error {

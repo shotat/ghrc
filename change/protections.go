@@ -20,10 +20,21 @@ type ProtectionChange struct {
 // FIXME: duplicated
 func (c *ProtectionChange) String() string {
 	buf := bytes.NewBuffer(nil)
-	buf.WriteString(fmt.Sprintf("%s Protection\n", string(c.Action)))
+	buf.WriteString(c.subject())
 	diff := cmp.Diff(c.Before, c.After)
 	buf.WriteString(diff)
 	return buf.String()
+}
+
+func (c *ProtectionChange) subject() string {
+	var name string
+	switch c.Action {
+	case Create, Update:
+		name = c.After.Branch
+	case Delete:
+		name = c.Before.Branch
+	}
+	return fmt.Sprintf("%s Protection: %s\n", string(c.Action), name)
 }
 
 func (c *ProtectionChange) Apply(ctx context.Context, repoOwner string, repoName string) error {
