@@ -6,10 +6,10 @@ Repository configuration includes
 
 - Labels
 - Protected Branches
-- Visibility(private or public)
 - Merging Strategies
+- Visibility(private or public)
 - Topics
-- Description
+- Repository Metadata (Description, Homepage, etc.)
 
 ## Installation
 
