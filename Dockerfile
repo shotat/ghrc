@@ -17,6 +17,5 @@ FROM alpine:3.10
 
 RUN apk add --no-cache ca-certificates
 
-WORKDIR /app
-COPY --from=builder /go/src/github.com/shotat/ghrc/ghrc ./ghrc
-ENTRYPOINT ["./ghrc"]
+COPY --from=builder /go/src/github.com/shotat/ghrc/ghrc /usr/bin/ghrc
+ENTRYPOINT ["ghrc"]
