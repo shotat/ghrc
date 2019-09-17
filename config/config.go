@@ -15,8 +15,8 @@ import (
 
 // Config represents a desired remote configuration.
 type Config struct {
-	Metadata *metadata.Metadata `yaml:"metadata"`
-	Spec     *spec.Spec         `yaml:"spec"`
+	Metadata metadata.Metadata `yaml:"metadata"`
+	Spec     spec.Spec         `yaml:"spec"`
 }
 
 // ToYAML serialize Config to the YAML format.
@@ -46,8 +46,8 @@ func LoadFromFile(path string) (*Config, error) {
 // Import remote state to config
 func Import(ctx context.Context, owner string, name string) (*Config, error) {
 	conf := new(Config)
-	conf.Metadata = metadata.NewMetadata(owner, name)
-	conf.Spec = new(spec.Spec)
+	conf.Metadata = *metadata.NewMetadata(owner, name)
+	conf.Spec = spec.Spec{}
 
 	repo, err := state.FindRepo(ctx, owner, name)
 	if err != nil {
@@ -86,7 +86,9 @@ func (c *Config) CalculateChangeSet(ctx context.Context) (change.ChangeSet, erro
 	}
 
 	changeSet := make(change.ChangeSet, 0)
-	changeSet = append(changeSet, change.GetRepoChange(repo, c.Spec.Repo))
+	if ch := change.GetRepoChange(repo, c.Spec.Repo); ch != nil {
+		changeSet = append(changeSet, ch)
+	}
 	for _, labelChange := range change.GetLabelChangeSet(labels, c.Spec.Labels) {
 		changeSet = append(changeSet, labelChange)
 	}

@@ -37,6 +37,10 @@ func (c *RepoChange) String() string {
 }
 
 func GetRepoChange(st *state.Repo, sp *spec.Repo) *RepoChange {
+	if sp == nil {
+		return nil
+	}
+
 	after := &state.Repo{
 		Name:             st.Name,
 		Owner:            st.Owner,
