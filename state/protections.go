@@ -14,11 +14,10 @@ type Protection struct {
 }
 
 func NewProtection(branch string) *Protection {
-	enforceAdmins := false
 	return &Protection{
 		Branch:                     branch,
 		RequiredStatusChecks:       &RequiredStatusChecks{},
-		EnforceAdmins:              &enforceAdmins,
+		EnforceAdmins:              new(bool),
 		RequiredPullRequestReviews: &RequiredPullRequestReviews{},
 		Restrictions:               &Restrictions{},
 	}
@@ -44,7 +43,7 @@ type RequiredStatusChecks struct {
 func (p *Protection) Update(ctx context.Context, repoOwner string, repoName string) error {
 	req := &github.ProtectionRequest{}
 
-	if p.RequiredStatusChecks != nil && !(p.RequiredStatusChecks.Strict == false && len(p.RequiredStatusChecks.Contexts) == 0) {
+	if p.RequiredStatusChecks != nil {
 		requiredStatusChecks := &github.RequiredStatusChecks{}
 		requiredStatusChecks.Strict = p.RequiredStatusChecks.Strict
 		if p.RequiredStatusChecks.Contexts != nil {
