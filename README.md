@@ -19,7 +19,7 @@ $ go get github.com/shotat/ghrc
 
 ## Environment Variables
 
-- `GHRC_GITHUB_TOKEN`
+- `GHRC_GITHUB_TOKEN` (**Required**)
   - Your GitHub API Token
   - `repo` scope is required
 - `GHRC_GITHUB_API`
