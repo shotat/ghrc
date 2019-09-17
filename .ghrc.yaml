@@ -32,6 +32,7 @@ spec:
   - branch: master
     requiredStatusChecks:
       strict: false
+      contexts: []
     enforceAdmins: false
     requiredPullRequestReviews:
       dismissStaleReviews: false
