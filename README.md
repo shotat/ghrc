@@ -49,7 +49,7 @@ You can specify a config file explicitly with `-f`.
 $ ghrc plan -f .ghrc.yaml
 ```
 
-**Example Output**
+### Example
 
 ```
 $ ghrc plan
