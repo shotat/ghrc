@@ -82,6 +82,7 @@ func (sp *Protection) ToState() *state.Protection {
 		newState.RequiredStatusChecks.Contexts = sp.RequiredStatusChecks.Contexts
 	}
 
+	newState.EnforceAdmins = new(bool)
 	if sp.EnforceAdmins != nil {
 		newState.EnforceAdmins = sp.EnforceAdmins
 	}
