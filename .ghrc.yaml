@@ -32,19 +32,9 @@ spec:
   - branch: master
     requiredStatusChecks:
       strict: false
-      contexts: []
     enforceAdmins: false
     requiredPullRequestReviews:
       dismissStaleReviews: false
       requireCodeOwnerReviews: false
       requiredApprovingReviewCount: 1
-  - branch: test
-    requiredStatusChecks:
-      strict: true
-      contexts: []
-    enforceAdmins: true
-    requiredPullRequestReviews:
-      dismissStaleReviews: true
-      requireCodeOwnerReviews: true
-      requiredApprovingReviewCount: 3
 
