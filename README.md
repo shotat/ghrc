@@ -65,6 +65,8 @@ $ ghrc apply -f .ghrc.yaml
 
 ## Schema
 
+**Root**
+
 | Field Name | Type | Description |
 | ---------- | ---- | ----------- |
 | metadata | Metadata Object | **Required**. Provides metadata about the repository. |
@@ -72,5 +74,16 @@ $ ghrc apply -f .ghrc.yaml
 
 **Spec Object**
 
+| Field Name | Type | Description |
+| ---------- | ---- | ----------- |
+| owner | string | **Required**. A repository owner name. If the repository is owned by a user, specify user login name. Or if owned by a organization, specify organization login name. |
+| name | string | **Required**. A repository name. |
+
 **Metadata Object**
+
+| Field Name | Type | Description |
+| ---------- | ---- | ----------- |
+| repo | Repo Object | General configurations for the repository. |
+| labels | [Label Object] | List of label configurations. |
+| protections | [Protection Object] | List ob protection configurations. |
 
