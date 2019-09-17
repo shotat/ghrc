@@ -119,22 +119,22 @@ Check details in [GitHub API docs: Branches](https://developer.github.com/v3/rep
 | ---------- | ---- | ----------- |
 | branch | string | A branch name to be protected. |
 | enforceAdmins | boolean | Enforce all configured restrictions for administrators. |
-| requiredStatusChecks | [RequiredStatusChecks Object] | Require status checks to pass before merging. |
-| requiredPullRequestReviews | [RequiredPullRequestReviews Object] | Require at least one approving review on a pull request, before merging. |
+| requiredStatusChecks | RequiredStatusChecks Object | Require status checks to pass before merging. |
+| requiredPullRequestReviews | RequiredPullRequestReviews Object | Require at least one approving review on a pull request, before merging. |
 
 **RequiredStatusChecks Object**
 
 | Field | Type | Description |
 | ---------- | ---- | ----------- |
-| strict | string | Require branches to be up to date before merging. |
+| strict | boolean | Require branches to be up to date before merging. |
 | contexts | [string] | The list of status checks to require in order to merge into this branch. |
 
 **RequiredPullRequestReviews Object**
 
 | Field | Type | Description |
 | ---------- | ---- | ----------- |
-| dismissStaleReviews | bool | Set to true if you want to automatically dismiss approving reviews when someone pushes a new commit. |
-| requireCodeOwnerReviews | bool | Blocks merging pull requests until code owners review them. |
+| dismissStaleReviews | boolean | Set to true if you want to automatically dismiss approving reviews when someone pushes a new commit. |
+| requireCodeOwnerReviews | boolean | Blocks merging pull requests until code owners review them. |
 | requiredApprovingReviewCount | int | Specify the number of reviewers required to approve pull requests. Use a number between 1 and 6. |
 
 ### Example
