@@ -32,8 +32,8 @@ $ go get github.com/shotat/ghrc
 ### Import an existing repository state
 
 ```sh
-# ghrc import --owner <repository owner name> --name <repository name>
-$ ghrc import --owner shotat --name ghrc > .ghrc.yaml
+# ghrc import --name <repository full name>
+$ ghrc import --name shotat/ghrc > .ghrc.yaml
 ```
 
 ### Check expected changes without changing the actual state
@@ -120,14 +120,13 @@ $ ghrc apply -f .ghrc.yaml
 | metadata | Metadata Object | **Required**. Provides metadata about the repository. |
 | spec | Spec Object | **Required**. A desired state for the repository. |
 
-**Spec Object**
+**Metadata Object**
 
 | Field | Type | Description |
 | ---------- | ---- | ----------- |
-| owner | string | **Required**. A repository owner name. If the repository is owned by a user, specify user login name. Or if owned by a organization, specify organization login name. |
-| name | string | **Required**. A repository name. |
+| name | string | **Required**. A repository name. (e.g. shotat/ghrc) |
 
-**Metadata Object**
+**Spec Object**
 
 | Field | Type | Description |
 | ---------- | ---- | ----------- |
@@ -189,8 +188,7 @@ Check details in [GitHub API docs: Branches](https://developer.github.com/v3/rep
 
 ```yaml
 metadata:
-  owner: shotat
-  name: ghrc
+  name: shotat/ghrc
 spec:
   repo:
     description: GHRC is a tool for managing GitHub Repository Configurations in a declarative way.

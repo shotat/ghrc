@@ -1,6 +1,5 @@
 metadata:
-  owner: shotat
-  name: ghrc
+  name: shotat/ghrc
 spec:
   repo:
     description: GHRC is a tool for managing GitHub Repository Configurations in a
