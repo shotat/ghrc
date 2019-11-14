@@ -32,8 +32,8 @@ $ go get github.com/shotat/ghrc
 ### Import an existing repository state
 
 ```sh
-# ghrc import --name <repository full name>
-$ ghrc import --name shotat/ghrc > .ghrc.yaml
+# ghrc import <repository full name>
+$ ghrc import shotat/ghrc > .ghrc.yaml
 ```
 
 ### Check expected changes without changing the actual state
