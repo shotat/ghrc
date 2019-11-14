@@ -1,11 +1,10 @@
 metadata:
-  owner: shotat
-  name: ghrc
+  name: shotat/ghrc
 spec:
   repo:
     description: GHRC is a tool for managing GitHub Repository Configurations in a
       declarative way.
-    homepage: "https://github.com/shotat/ghrc"
+    homepage: https://github.com/shotat/ghrc
     private: false
     allowMergeCommit: false
     allowSquashMerge: true
@@ -26,7 +25,7 @@ spec:
     description: Further information is requested
     color: d876e3
   - name: review
-    description: "ready for review"
+    description: ready for review
     color: f0f0f0
   protections:
   - branch: master

@@ -10,19 +10,13 @@ import (
 
 // importCmd represents the import command
 var importCmd = &cobra.Command{
-	Use:   "import",
+	Use:   "import <repository name>",
 	Short: "Import an existing repository state",
+	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		owner, err := cmd.Flags().GetString("owner")
-		if err != nil {
-			return err
-		}
-		name, err := cmd.Flags().GetString("name")
-		if err != nil {
-			return err
-		}
+		name := args[0]
 		ctx := context.Background()
-		conf, err := config.Import(ctx, owner, name)
+		conf, err := config.Import(ctx, name)
 		if err != nil {
 			return err
 		}
@@ -38,9 +32,6 @@ var importCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(importCmd)
-
-	importCmd.Flags().String("name", "", "repository name")
-	importCmd.Flags().String("owner", "", "owner name")
 
 	// Here you will define your flags and configuration settings.
 

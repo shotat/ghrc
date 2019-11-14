@@ -3,8 +3,10 @@ package config
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io/ioutil"
+	"strings"
 
 	"github.com/shotat/ghrc/change"
 	"github.com/shotat/ghrc/metadata"
@@ -43,23 +45,36 @@ func LoadFromFile(path string) (*Config, error) {
 	return conf, nil
 }
 
+func parseName(name string) (string, string, error) {
+	splitted := strings.Split(name, "/")
+	if len(splitted) != 2 {
+		return "", "", errors.New("invalid name")
+	}
+	return splitted[0], splitted[1], nil
+}
+
 // Import remote state to config
-func Import(ctx context.Context, owner string, name string) (*Config, error) {
+func Import(ctx context.Context, fullName string) (*Config, error) {
 	conf := new(Config)
-	conf.Metadata = *metadata.NewMetadata(owner, name)
+	conf.Metadata = *metadata.NewMetadata(fullName)
 	conf.Spec = spec.Spec{}
 
-	repo, err := state.FindRepo(ctx, owner, name)
+	owner, repoName, err := parseName(fullName)
 	if err != nil {
 		return nil, err
 	}
 
-	labels, err := state.FindLabels(ctx, owner, name)
+	repo, err := state.FindRepo(ctx, owner, repoName)
 	if err != nil {
 		return nil, err
 	}
 
-	protections, err := state.FindProtections(ctx, owner, name)
+	labels, err := state.FindLabels(ctx, owner, repoName)
+	if err != nil {
+		return nil, err
+	}
+
+	protections, err := state.FindProtections(ctx, owner, repoName)
 	if err != nil {
 		return nil, err
 	}
@@ -72,15 +87,20 @@ func Import(ctx context.Context, owner string, name string) (*Config, error) {
 }
 
 func (c *Config) CalculateChangeSet(ctx context.Context) (change.ChangeSet, error) {
-	repo, err := state.FindRepo(ctx, c.Metadata.Owner, c.Metadata.Name)
+	owner, repoName, err := parseName(c.Metadata.Name)
 	if err != nil {
 		return nil, err
 	}
-	labels, err := state.FindLabels(ctx, c.Metadata.Owner, c.Metadata.Name)
+
+	repo, err := state.FindRepo(ctx, owner, repoName)
 	if err != nil {
 		return nil, err
 	}
-	protections, err := state.FindProtections(ctx, c.Metadata.Owner, c.Metadata.Name)
+	labels, err := state.FindLabels(ctx, owner, repoName)
+	if err != nil {
+		return nil, err
+	}
+	protections, err := state.FindProtections(ctx, owner, repoName)
 	if err != nil {
 		return nil, err
 	}
@@ -118,8 +138,13 @@ func (c *Config) Apply(ctx context.Context) error {
 		return err
 	}
 
+	owner, repoName, err := parseName(c.Metadata.Name)
+	if err != nil {
+		return err
+	}
+
 	for _, ch := range cs {
-		if err := ch.Apply(ctx, c.Metadata.Owner, c.Metadata.Name); err != nil {
+		if err := ch.Apply(ctx, owner, repoName); err != nil {
 			return err
 		}
 	}
