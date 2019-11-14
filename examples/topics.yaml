@@ -1,0 +1,7 @@
+spec:
+  repo:
+    topics:
+    - cli
+    - git
+    - github
+    - go

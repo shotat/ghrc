@@ -22,6 +22,11 @@ var planCmd = &cobra.Command{
 			return err
 		}
 
+		name, _ := cmd.Flags().GetString("name")
+		if name != "" {
+			conf.Metadata.Name = name
+		}
+
 		ctx := context.Background()
 
 		return conf.Plan(ctx)
@@ -31,4 +36,5 @@ var planCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(planCmd)
 	planCmd.Flags().StringP("filename", "f", ".ghrc.yaml", "config file name")
+	planCmd.Flags().String("name", "", "repository full name")
 }
