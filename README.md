@@ -22,7 +22,7 @@ $ go get github.com/shotat/ghrc
 - `GHRC_GITHUB_TOKEN` (**Required**)
   - Your GitHub API Token
   - `repo` scope is required
-- `GHRC_GITHUB_API`
+- `GHRC_GITHUB_API` (**Optional**)
   - GitHub API BaseURL
     - Default: `https://api.github.com/`
     - Enterprise: `https://<domain>/api/v3/`
@@ -47,6 +47,12 @@ You can specify a config file explicitly with `-f`.
 
 ```sh
 $ ghrc plan -f .ghrc.yaml
+```
+
+If `--name` option is specified, `metadata.name` is overridden.
+
+```sh
+$ ghrc plan --name shotat/rbdash
 ```
 
 ### Example
@@ -111,20 +117,26 @@ You can specify a config file explicitly with `-f`.
 $ ghrc apply -f .ghrc.yaml
 ```
 
+If `--name` option is specified, `metadata.name` is overridden.
+
+```sh
+$ ghrc apply --name shotat/rbdash
+```
+
 ## Schema
 
 **Root**
 
 | Field | Type | Description |
 | ---------- | ---- | ----------- |
-| metadata | Metadata Object | **Required**. Provides metadata about the repository. |
+| metadata | Metadata Object | Provides metadata about the repository. If omitted, `metadata.name` must be specified by `--name` option instead. |
 | spec | Spec Object | **Required**. A desired state for the repository. |
 
 **Metadata Object**
 
 | Field | Type | Description |
 | ---------- | ---- | ----------- |
-| name | string | **Required**. A repository name. (e.g. shotat/ghrc) |
+| name | string | A repository name (e.g. shotat/ghrc). If omitted, `metadata.name` must be specified by `--name` option instead. |
 
 **Spec Object**
 

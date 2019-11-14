@@ -25,6 +25,11 @@ var applyCmd = &cobra.Command{
 
 		ctx := context.Background()
 
+		name, _ := cmd.Flags().GetString("name")
+		if name != "" {
+			conf.Metadata.Name = name
+		}
+
 		if err := conf.Apply(ctx); err != nil {
 			return err
 		}
@@ -36,4 +41,5 @@ var applyCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(applyCmd)
 	applyCmd.Flags().StringP("filename", "f", ".ghrc.yaml", "config file name")
+	applyCmd.Flags().String("name", "", "repository full name")
 }

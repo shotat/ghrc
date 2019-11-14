@@ -1,0 +1,15 @@
+# ghrc plan --name shotat/ghrc -f examples/labels.yaml
+spec:
+  labels:
+  - name: bug
+    description: Something isn't working
+    color: d73a4a
+  - name: documentation
+    description: Improvements or additions to documentation
+    color: 0075ca
+  - name: question
+    description: Further information is requested
+    color: d876e3
+  - name: review
+    description: ready for review
+    color: f0f0f0
