@@ -1,3 +1,5 @@
+# ghrc plan --name shotat/ghrc -f examples/topics.yaml
+# NOTE: this config updates other attributes unexpectedly.
 spec:
   repo:
     topics:
