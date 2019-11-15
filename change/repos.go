@@ -55,15 +55,36 @@ func GetRepoChange(st *state.Repo, sp *spec.Repo) *RepoChange {
 	after := &state.Repo{
 		Name:             st.Name,
 		Owner:            st.Owner,
-		Description:      sp.Description,
-		Homepage:         sp.Homepage,
-		Private:          sp.Private,
-		AllowSquashMerge: sp.AllowSquashMerge,
-		AllowMergeCommit: sp.AllowMergeCommit,
-		AllowRebaseMerge: sp.AllowRebaseMerge,
-		Topics:           sp.Topics,
+		Description:      st.Description,
+		Homepage:         st.Homepage,
+		Private:          st.Private,
+		AllowSquashMerge: st.AllowSquashMerge,
+		AllowMergeCommit: st.AllowMergeCommit,
+		AllowRebaseMerge: st.AllowRebaseMerge,
+		Topics:           st.Topics,
 	}
 
+	if sp.Description != nil {
+		after.Description = *sp.Description
+	}
+	if sp.Homepage != nil {
+		after.Homepage = *sp.Homepage
+	}
+	if sp.Private != nil {
+		after.Private = *sp.Private
+	}
+	if sp.AllowSquashMerge != nil {
+		after.AllowSquashMerge = *sp.AllowSquashMerge
+	}
+	if sp.AllowMergeCommit != nil {
+		after.AllowMergeCommit = *sp.AllowMergeCommit
+	}
+	if sp.AllowRebaseMerge != nil {
+		after.AllowRebaseMerge = *sp.AllowRebaseMerge
+	}
+	if sp.Topics != nil {
+		after.Topics = sp.Topics
+	}
 	return &RepoChange{
 		Action: Update,
 		Before: st,
