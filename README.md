@@ -160,6 +160,8 @@ Check details in [GitHub API docs: Repositories](https://developer.github.com/v3
 | allowRebaseMerge | boolean | Either true to allow rebase-merging pull requests, or false to prevent rebase-merging. |
 | topics | [string] | An array of topics. **Note: Topic names cannot contain uppercase letters.** |
 
+NOTE: Each field is not managed by GHRC when omitted or specified to `null`
+
 **Label Object**
 
 Check details in [GitHub API docs: Labels](https://developer.github.com/v3/issues/labels/)
