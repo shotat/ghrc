@@ -49,6 +49,57 @@ func (c *LabelChange) Apply(ctx context.Context, repoOwner string, repoName stri
 	return err
 }
 
+func getLabelChange(st *state.Label, sp *spec.Label) *LabelChange {
+	if st == nil {
+		after := &state.Label{
+			Name:        sp.Name,
+			Description: "",
+			Color:       "f0f0f0", // TODO: auto generation
+		}
+		if sp.Description != nil {
+			after.Description = *sp.Description
+		}
+		if sp.Color != nil {
+			after.Color = *sp.Color
+		}
+		// New
+		return &LabelChange{
+			Action: Create,
+			Before: nil,
+			After:  after,
+		}
+	}
+
+	if sp == nil {
+		// Delete
+		return &LabelChange{
+			Action: Delete,
+			Before: st,
+			After:  nil,
+		}
+	}
+
+	// Update
+	after := &state.Label{
+		Name:        st.Name,
+		Description: st.Description,
+		Color:       st.Color,
+	}
+	if sp.Description != nil {
+		after.Description = *sp.Description
+	}
+
+	if sp.Color != nil {
+		after.Color = *sp.Color
+	}
+
+	return &LabelChange{
+		Action: Update,
+		Before: st,
+		After:  after,
+	}
+}
+
 func GetLabelChangeSet(st []state.Label, sp spec.Labels) []*LabelChange {
 	changes := make([]*LabelChange, 0)
 	if sp == nil {
@@ -59,20 +110,14 @@ func GetLabelChangeSet(st []state.Label, sp spec.Labels) []*LabelChange {
 			for _, stl := range st {
 				if stl.Name == spl.Name {
 					// update existing label
-					changes = append(changes, &LabelChange{
-						Action: Update,
-						Before: &stl,
-						After:  spl.ToState(),
-					})
+					ch := getLabelChange(&stl, &spl)
+					changes = append(changes, ch)
 					return
 				}
 			}
 			// new label
-			changes = append(changes, &LabelChange{
-				Action: Create,
-				Before: nil,
-				After:  spl.ToState(),
-			})
+			ch := getLabelChange(nil, &spl)
+			changes = append(changes, ch)
 			return
 		}(spl)
 	}
@@ -83,13 +128,9 @@ func GetLabelChangeSet(st []state.Label, sp spec.Labels) []*LabelChange {
 					return
 				}
 			}
-
 			// deletion
-			changes = append(changes, &LabelChange{
-				Action: Delete,
-				Before: &stl,
-				After:  nil,
-			})
+			ch := getLabelChange(&stl, nil)
+			changes = append(changes, ch)
 		}(stl)
 	}
 	return changes
