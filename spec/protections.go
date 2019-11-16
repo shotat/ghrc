@@ -3,7 +3,7 @@ package spec
 import "github.com/shotat/ghrc/state"
 
 type Protection struct {
-	Branch                     string                      `yaml:"branch"`
+	Branch                     string                      `yaml:"branch"` // required
 	RequiredStatusChecks       *RequiredStatusChecks       `yaml:"requiredStatusChecks,omitempty"`
 	EnforceAdmins              *bool                       `yaml:"enforceAdmins,omitempty"`
 	RequiredPullRequestReviews *RequiredPullRequestReviews `yaml:"requiredPullRequestReviews,omitempty"`
